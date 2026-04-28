@@ -1,8 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AppProvider } from './contexts/AppContext'
+import AppLayout from './components/AppLayout'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
-import Main from './pages/Main'
+import Home from './pages/Home'
+import MealPlans from './pages/MealPlans'
+import Workouts from './pages/Workouts'
+import Friends from './pages/Friends'
+import Profile from './pages/Profile'
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('token')
@@ -16,14 +21,22 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+
           <Route
-            path="/main"
             element={
               <PrivateRoute>
-                <Main />
+                <AppLayout />
               </PrivateRoute>
             }
-          />
+          >
+            <Route path="/" element={<Home />} />
+            <Route path="/mealplans" element={<MealPlans />} />
+            <Route path="/workouts" element={<Workouts />} />
+            <Route path="/friends" element={<Friends />} />
+            <Route path="/u/:username" element={<Profile />} />
+            <Route path="/main" element={<Navigate to="/" replace />} />
+          </Route>
+
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>

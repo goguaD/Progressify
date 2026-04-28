@@ -13,6 +13,7 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
 
   const [form, setForm] = useState({
+    username: '',
     firstname: '',
     lastname: '',
     middlename: '',
@@ -22,7 +23,10 @@ export default function SignUp() {
     weight: '',
     height: '',
     goal: '',
+    gender: '',
   })
+
+  const USERNAME_RE = /^[a-z0-9_]{3,20}$/
 
   const GOALS = [
     { value: 'muscle_gain',  label: t.goals.muscle_gain },
@@ -33,13 +37,17 @@ export default function SignUp() {
   ]
 
   function handleChange(e) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    let value = e.target.value
+    if (e.target.name === 'username') value = value.toLowerCase()
+    setForm((prev) => ({ ...prev, [e.target.name]: value }))
     setError('')
   }
 
   function validateStep1() {
     if (!form.firstname.trim()) return t.err_firstname
     if (!form.lastname.trim()) return t.err_lastname
+    if (!form.username.trim()) return t.err_username_req
+    if (!USERNAME_RE.test(form.username.trim())) return t.err_username_format
     if (!form.email.trim()) return t.err_email_req
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return t.err_email_invalid
     if (form.password.length < 6) return t.err_password_short
@@ -50,6 +58,7 @@ export default function SignUp() {
   function validateStep2() {
     if (!form.weight || isNaN(form.weight) || Number(form.weight) <= 0) return t.err_weight
     if (!form.height || isNaN(form.height) || Number(form.height) <= 0) return t.err_height
+    if (!form.gender) return t.err_gender
     if (!form.goal) return t.err_goal
     return null
   }
@@ -70,6 +79,7 @@ export default function SignUp() {
     setLoading(true)
     try {
       const { data } = await api.post('/auth/register', {
+        username: form.username.trim().toLowerCase(),
         firstname: form.firstname.trim(),
         lastname: form.lastname.trim(),
         middlename: form.middlename.trim() || null,
@@ -78,10 +88,11 @@ export default function SignUp() {
         weight: Number(form.weight),
         height: Number(form.height),
         goal: form.goal,
+        gender: form.gender,
       })
       localStorage.setItem('token', data.access_token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      navigate('/main')
+      navigate('/')
     } catch (err) {
       setError(err.response?.data?.detail || t.err_register)
     } finally {
@@ -155,6 +166,23 @@ export default function SignUp() {
                   placeholder={t.ph_middlename}
                   value={form.middlename}
                   onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="username">
+                  {t.username}{' '}
+                  <span className="optional-tag">{t.username_hint}</span>
+                </label>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  placeholder={t.ph_username}
+                  value={form.username}
+                  onChange={handleChange}
+                  autoComplete="username"
+                  spellCheck={false}
                 />
               </div>
 
@@ -266,6 +294,28 @@ export default function SignUp() {
                     />
                     <span className="input-unit">cm</span>
                   </div>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>{t.gender}</label>
+                <div className="gender-toggle">
+                  <button
+                    type="button"
+                    className={`gender-option ${form.gender === 'male' ? 'active' : ''}`}
+                    onClick={() => { setForm((p) => ({ ...p, gender: 'male' })); setError('') }}
+                  >
+                    <span className="gender-icon">♂</span>
+                    {t.gender_male}
+                  </button>
+                  <button
+                    type="button"
+                    className={`gender-option ${form.gender === 'female' ? 'active' : ''}`}
+                    onClick={() => { setForm((p) => ({ ...p, gender: 'female' })); setError('') }}
+                  >
+                    <span className="gender-icon">♀</span>
+                    {t.gender_female}
+                  </button>
                 </div>
               </div>
 

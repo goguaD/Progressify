@@ -31,7 +31,7 @@ export default function Login() {
       })
       localStorage.setItem('token', data.access_token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      navigate('/main')
+      navigate('/')
     } catch (err) {
       setError(err.response?.data?.detail || t.login_err_generic)
     } finally {
