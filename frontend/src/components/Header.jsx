@@ -8,10 +8,11 @@ export default function Header({ user, onLogout }) {
   const navigate = useNavigate()
 
   const navItems = [
-    { to: '/',          label: t.nav_home },
-    { to: '/mealplans', label: t.nav_mealplans },
-    { to: '/workouts',  label: t.nav_workouts },
-    { to: '/friends',   label: t.nav_friends },
+    { to: '/',            label: t.nav_home },
+    { to: '/mealplans',   label: t.nav_mealplans },
+    { to: '/workouts',    label: t.nav_workouts },
+    { to: '/friends',     label: t.nav_friends },
+    { to: '/challenges',  label: t.nav_challenges },
   ]
 
   const initials = ((user?.firstname?.[0] || '') + (user?.lastname?.[0] || '')).toUpperCase() || '?'

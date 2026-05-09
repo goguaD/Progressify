@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import MealPlans from './pages/MealPlans'
 import Workouts from './pages/Workouts'
 import Friends from './pages/Friends'
+import Challenges from './pages/Challenges'
 import Profile from './pages/Profile'
 
 function PrivateRoute({ children }) {
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/mealplans" element={<MealPlans />} />
             <Route path="/workouts" element={<Workouts />} />
             <Route path="/friends" element={<Friends />} />
+            <Route path="/challenges" element={<Challenges />} />
             <Route path="/u/:username" element={<Profile />} />
             <Route path="/main" element={<Navigate to="/" replace />} />
           </Route>

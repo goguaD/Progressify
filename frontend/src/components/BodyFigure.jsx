@@ -1,35 +1,22 @@
 import Body from 'react-muscle-highlighter'
 
-/**
- * Anatomy figure for the profile page.
- *
- * Renders a vector body with ~23 muscle groups (chest, biceps, triceps,
- * abs, deltoids, lats, glutes, quads, hamstrings, calves, …) exposed as
- * separate SVG paths. Any muscle can be recolored at runtime through the
- * `muscles` prop — no SVG editing needed.
- *
- * Props:
- *   gender:  'male' | 'female' | null     (null falls back to male)
- *   view:    'front' | 'back'
- *   muscles: { [slug]: 'light' | 'medium' | 'strong' }
- *
- * Slugs supported by the library (front + back combined):
- *   abs, adductors, ankles, biceps, calves, chest, deltoids, feet, forearm,
- *   gluteal, hamstring, hands, hair, head, knees, lower-back, neck,
- *   obliques, quadriceps, tibialis, trapezius, triceps, upper-back
- */
+export const LEVELS = ['beginner', 'intermediate', 'advanced', 'elite']
 
-// colors[intensity - 1] = display color
-// 'strong' -> 1 (most saturated), 'medium' -> 2, 'light' -> 3.
-const INTENSITY_COLORS = ['#ef4444', '#fb923c', '#fbbf24']
-const INTENSITY_BY_LEVEL = { strong: 1, medium: 2, light: 3 }
+export const LEVEL_COLORS = {
+  beginner:     '#22c55e',
+  intermediate: '#3b82f6',
+  advanced:     '#a855f7',
+  elite:        '#eab308',
+}
+
+const LEVEL_TO_INTENSITY = { beginner: 1, intermediate: 2, advanced: 3, elite: 4 }
 
 export default function BodyFigure({ gender = 'male', view = 'front', muscles = {} }) {
   const safeView = view === 'back' ? 'back' : 'front'
 
   const data = Object.entries(muscles)
-    .filter(([, level]) => level && INTENSITY_BY_LEVEL[level])
-    .map(([slug, level]) => ({ slug, intensity: INTENSITY_BY_LEVEL[level] }))
+    .filter(([, level]) => level && LEVEL_TO_INTENSITY[level])
+    .map(([slug, level]) => ({ slug, intensity: LEVEL_TO_INTENSITY[level] }))
 
   return (
     <div className="anatomy-vector">
@@ -38,7 +25,12 @@ export default function BodyFigure({ gender = 'male', view = 'front', muscles = 
         side={safeView}
         gender={gender === 'female' ? 'female' : 'male'}
         scale={1.1}
-        colors={INTENSITY_COLORS}
+        colors={[
+          LEVEL_COLORS.beginner,
+          LEVEL_COLORS.intermediate,
+          LEVEL_COLORS.advanced,
+          LEVEL_COLORS.elite,
+        ]}
         defaultFill="var(--muscle-base)"
         defaultStroke="var(--muscle-stroke)"
         defaultStrokeWidth={0.6}
