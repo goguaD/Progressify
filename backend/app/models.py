@@ -128,3 +128,64 @@ class Challenge(Base):
     winner = relationship("User", foreign_keys=[winner_id])
 
     __table_args__ = (CheckConstraint("challenger_id != opponent_id", name="ck_challenge_no_self"),)
+
+
+class Meal(Base):
+    __tablename__ = "meals"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    name_ka = Column(String, nullable=True)
+    description = Column(Text, nullable=False)
+    description_ka = Column(Text, nullable=True)
+    image_url = Column(String, nullable=True)
+    goal = Column(String, nullable=False, index=True)
+    calories = Column(Integer, nullable=False)
+    protein = Column(Float, nullable=False)
+    carbs = Column(Float, nullable=False)
+    fat = Column(Float, nullable=False)
+    fiber = Column(Float, nullable=True)
+    sugar = Column(Float, nullable=True)
+    views = Column(Integer, nullable=False, default=0)
+    rating_sum = Column(Float, nullable=False, default=0.0)
+    rating_count = Column(Integer, nullable=False, default=0)
+    added_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    is_default = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    author = relationship("User", foreign_keys=[added_by])
+    ratings = relationship("MealRating", back_populates="meal", cascade="all, delete-orphan")
+    user_views = relationship("MealView", back_populates="meal", cascade="all, delete-orphan")
+
+
+class MealRating(Base):
+    __tablename__ = "meal_ratings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    meal_id = Column(Integer, ForeignKey("meals.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    score = Column(Float, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    meal = relationship("Meal", back_populates="ratings")
+    user = relationship("User")
+
+    __table_args__ = (
+        UniqueConstraint("meal_id", "user_id", name="uq_meal_rating_user"),
+        CheckConstraint("score >= 0 AND score <= 5", name="ck_rating_range"),
+    )
+
+
+class MealView(Base):
+    __tablename__ = "meal_views"
+
+    id = Column(Integer, primary_key=True, index=True)
+    meal_id = Column(Integer, ForeignKey("meals.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    meal = relationship("Meal", back_populates="user_views")
+
+    __table_args__ = (
+        UniqueConstraint("meal_id", "user_id", name="uq_meal_view_user"),
+    )

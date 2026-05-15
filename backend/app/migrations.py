@@ -24,6 +24,34 @@ def ensure_users_columns() -> None:
                 conn.execute(text(f"ALTER TABLE users ADD COLUMN {name} {decl}"))
 
 
+def ensure_meals_columns() -> None:
+    """Adds missing columns to the meals table and creates meal_views table."""
+    with engine.begin() as conn:
+        try:
+            rows = conn.execute(text("PRAGMA table_info(meals)")).fetchall()
+        except Exception:
+            return
+        existing = {r[1] for r in rows}
+        new_cols: dict[str, str] = {
+            "name_ka": "VARCHAR",
+            "description_ka": "TEXT",
+        }
+        for name, decl in new_cols.items():
+            if name not in existing:
+                conn.execute(text(f"ALTER TABLE meals ADD COLUMN {name} {decl}"))
+
+        conn.execute(
+            text(
+                "CREATE TABLE IF NOT EXISTS meal_views ("
+                "id INTEGER PRIMARY KEY, "
+                "meal_id INTEGER NOT NULL REFERENCES meals(id) ON DELETE CASCADE, "
+                "user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, "
+                "created_at DATETIME DEFAULT CURRENT_TIMESTAMP, "
+                "UNIQUE(meal_id, user_id))"
+            )
+        )
+
+
 def ensure_challenges_columns() -> None:
     """Adds missing columns to the challenges table for forward-migration."""
     expected: dict[str, str] = {

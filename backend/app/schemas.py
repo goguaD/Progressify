@@ -219,3 +219,46 @@ class H2HScore(BaseModel):
     wins: int
     losses: int
     draws: int
+
+
+# ── Meals ────────────────────────────────────────────────────────────────────
+
+MEAL_GOALS = {"cut", "bulk", "maintain", "general"}
+
+
+class MealOut(BaseModel):
+    id: int
+    name: str
+    name_ka: str | None = None
+    description: str
+    description_ka: str | None = None
+    image_url: str | None
+    goal: str
+    calories: int
+    protein: float
+    carbs: float
+    fat: float
+    fiber: float | None
+    sugar: float | None
+    views: int
+    rating: float
+    rating_count: int
+    my_rating: float | None = None
+    added_by_username: str | None = None
+    is_default: bool
+    created_at: datetime | None
+
+    model_config = {"from_attributes": True}
+
+
+class MealRateRequest(BaseModel):
+    score: float
+
+    @field_validator("score")
+    @classmethod
+    def _valid_score(cls, v: float) -> float:
+        if v < 0 or v > 5:
+            raise ValueError("Score must be between 0 and 5.")
+        if (v * 2) != int(v * 2):
+            raise ValueError("Score must be in 0.5 increments.")
+        return v
