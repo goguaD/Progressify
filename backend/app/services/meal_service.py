@@ -509,6 +509,170 @@ DEFAULT_MEALS: list[dict] = [
         "sugar": 6.0,
     },
 
+    # ── Cheat Meals (healthier alternatives) ─────────────────
+
+    {
+        "name": "High-Protein Chocolate Mug Cake",
+        "description": (
+            "Serves 1 | Prep: 3 min | Cook: 2 min (microwave)\n\n"
+            "Ingredients:\n"
+            "• 1 scoop (30 g) chocolate whey protein powder\n"
+            "• 1 tbsp cocoa powder (unsweetened)\n"
+            "• 1 large egg\n"
+            "• 2 tbsp unsweetened applesauce (30 g)\n"
+            "• 1 tbsp almond flour (7 g)\n"
+            "• ½ tsp baking powder\n"
+            "• Pinch of salt\n"
+            "• Optional: 10 g dark chocolate chips, 1 tsp honey\n\n"
+            "Instructions:\n"
+            "1. In a microwave-safe mug, whisk together the egg and applesauce until smooth.\n"
+            "2. Add protein powder, cocoa powder, almond flour, baking powder and salt. "
+            "Stir until a smooth batter forms with no dry pockets.\n"
+            "3. Fold in chocolate chips if using.\n"
+            "4. Microwave on high for 60–90 seconds. The cake should be set on top but still "
+            "slightly moist in the centre — it will firm up as it cools.\n"
+            "5. Let it cool for 1 minute, then eat straight from the mug or flip onto a plate. "
+            "Drizzle with honey if desired."
+        ),
+        "image_url": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600",
+        "goal": "cheat",
+        "calories": 260,
+        "protein": 30.0,
+        "carbs": 14.0,
+        "fat": 9.0,
+        "fiber": 3.0,
+        "sugar": 5.0,
+    },
+    {
+        "name": "Cauliflower Crust Margherita Pizza",
+        "description": (
+            "Serves 1 (personal pizza) | Prep: 15 min | Cook: 20 min\n\n"
+            "Ingredients:\n"
+            "• 250 g cauliflower florets (about ½ medium head)\n"
+            "• 1 large egg\n"
+            "• 40 g shredded mozzarella (for crust)\n"
+            "• 1 tbsp almond flour\n"
+            "• ½ tsp garlic powder, ½ tsp dried oregano, pinch of salt\n"
+            "Topping:\n"
+            "• 3 tbsp marinara sauce\n"
+            "• 50 g fresh mozzarella, sliced\n"
+            "• 5–6 fresh basil leaves\n"
+            "• ½ tsp olive oil (for drizzle)\n\n"
+            "Instructions:\n"
+            "1. Preheat oven to 220 °C (425 °F). Line a baking sheet with parchment paper.\n"
+            "2. Rice the cauliflower in a food processor until fine crumbles. "
+            "Microwave for 4 minutes, then squeeze out ALL moisture using a clean kitchen towel — "
+            "this is the most important step for a crispy crust.\n"
+            "3. Mix dry cauliflower with egg, shredded mozzarella, almond flour, garlic powder, "
+            "oregano and salt. Shape into a thin round (about 25 cm / 10 inches) on the parchment.\n"
+            "4. Bake the crust alone for 12–14 minutes until golden and firm enough to lift.\n"
+            "5. Spread marinara sauce, lay fresh mozzarella slices on top. "
+            "Return to oven for 5–6 minutes until cheese melts and bubbles.\n"
+            "6. Top with fresh basil, drizzle with olive oil, slice and serve."
+        ),
+        "image_url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600",
+        "goal": "cheat",
+        "calories": 340,
+        "protein": 26.0,
+        "carbs": 18.0,
+        "fat": 16.0,
+        "fiber": 5.0,
+        "sugar": 8.0,
+    },
+    {
+        "name": "Frozen Greek Yogurt Bark",
+        "description": (
+            "Serves 4 | Prep: 10 min | Freeze: 2 hours | No cooking required\n\n"
+            "Ingredients:\n"
+            "• 400 g Greek yogurt (0% or 2% fat)\n"
+            "• 2 tbsp honey (30 g)\n"
+            "• 1 tsp vanilla extract\n"
+            "• 60 g mixed berries (blueberries, raspberries, sliced strawberries)\n"
+            "• 20 g dark chocolate chips\n"
+            "• 15 g unsweetened coconut flakes\n"
+            "• 15 g crushed pistachios\n\n"
+            "Instructions:\n"
+            "1. Line a baking sheet with parchment paper.\n"
+            "2. In a bowl, stir together Greek yogurt, honey and vanilla until smooth.\n"
+            "3. Spread the yogurt mixture evenly onto the parchment in a thin layer "
+            "(about 0.5 cm thick, roughly 25 × 35 cm rectangle).\n"
+            "4. Scatter berries, chocolate chips, coconut flakes and pistachios over the surface. "
+            "Press them gently into the yogurt.\n"
+            "5. Freeze for at least 2 hours until completely solid.\n"
+            "6. Break into irregular pieces (like bark). Store in a sealed container in the freezer "
+            "for up to 2 weeks. Nutritional info is per serving (¼ of total)."
+        ),
+        "image_url": "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600",
+        "goal": "cheat",
+        "calories": 180,
+        "protein": 14.0,
+        "carbs": 20.0,
+        "fat": 5.0,
+        "fiber": 2.0,
+        "sugar": 16.0,
+    },
+    {
+        "name": "Protein Ice Cream (3-Ingredient)",
+        "description": (
+            "Serves 1 | Prep: 5 min | Freeze: 1 min (blender) | No cooking required\n\n"
+            "Ingredients:\n"
+            "• 2 medium frozen bananas (about 200 g, sliced and frozen overnight)\n"
+            "• 1 scoop (30 g) vanilla or chocolate whey protein\n"
+            "• 2 tbsp unsweetened almond milk (30 ml)\n"
+            "• Optional toppings: 10 g crushed nuts, 1 tsp honey, cinnamon\n\n"
+            "Instructions:\n"
+            "1. Add frozen banana slices, protein powder and almond milk to a food processor "
+            "or high-speed blender.\n"
+            "2. Blend for 30–45 seconds, scraping down the sides once. The mixture will first "
+            "look crumbly, then suddenly turn into a thick, creamy soft-serve consistency.\n"
+            "3. Do NOT over-blend — if it becomes too liquid, pop the bowl into the freezer "
+            "for 15 minutes.\n"
+            "4. Scoop into a bowl and add toppings if desired. Eat immediately for soft-serve "
+            "texture, or freeze for 20–30 minutes for firmer ice cream."
+        ),
+        "image_url": "https://images.unsplash.com/photo-1570197571499-166b36435e9f?w=600",
+        "goal": "cheat",
+        "calories": 290,
+        "protein": 28.0,
+        "carbs": 42.0,
+        "fat": 3.0,
+        "fiber": 4.0,
+        "sugar": 24.0,
+    },
+    {
+        "name": "Turkey Lettuce Wrap Tacos",
+        "description": (
+            "Serves 1 (3 tacos) | Prep: 5 min | Cook: 10 min\n\n"
+            "Ingredients:\n"
+            "• 200 g lean ground turkey\n"
+            "• ½ tsp cumin, ½ tsp chili powder, ½ tsp garlic powder\n"
+            "• ¼ tsp smoked paprika, salt & pepper\n"
+            "• 1 tsp olive oil\n"
+            "• 3 large butter lettuce or iceberg leaves (as taco shells)\n"
+            "• 30 g pico de gallo or fresh salsa\n"
+            "• 20 g shredded cheese (cheddar or Mexican blend)\n"
+            "• 1 tbsp Greek yogurt (instead of sour cream)\n"
+            "• Squeeze of lime\n\n"
+            "Instructions:\n"
+            "1. Heat olive oil in a skillet over medium-high heat. Add ground turkey, break it up "
+            "with a spatula, and cook for 5–6 minutes until no longer pink.\n"
+            "2. Add cumin, chili powder, garlic powder, paprika, salt and pepper. Stir and cook "
+            "for another 2 minutes until fragrant.\n"
+            "3. Wash and dry the lettuce leaves — choose large, cupped ones that hold filling well.\n"
+            "4. Divide the seasoned turkey among the three lettuce cups.\n"
+            "5. Top each with pico de gallo, shredded cheese, a dollop of Greek yogurt and "
+            "a squeeze of lime. Serve immediately."
+        ),
+        "image_url": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600",
+        "goal": "cheat",
+        "calories": 380,
+        "protein": 42.0,
+        "carbs": 8.0,
+        "fat": 18.0,
+        "fiber": 2.0,
+        "sugar": 3.0,
+    },
+
 ]
 
 # Georgian translations keyed by English meal name.
@@ -865,6 +1029,122 @@ GEORGIAN_TRANSLATIONS: dict[str, dict[str, str]] = {
             "4. სანამ სტეიკი ისვენებს, ათქვიფეთ ბალზამიკოს ძმარი, ზეითუნის ზეთი და დიჟონის მდოგვი.\n"
             "5. სალათის ფოთლები მოათავსეთ თეფშზე, ზემოდან დაალაგეთ პომიდორი, წითელი ხახვი "
             "და სტეიკის ნაჭრები. მოაყარეთ ლურჯი ყველი და მოასხით დრესინგი."
+        ),
+    },
+    "High-Protein Chocolate Mug Cake": {
+        "name_ka": "მაღალპროტეინიანი შოკოლადის კექსი ჭიქაში",
+        "description_ka": (
+            "ულუფა: 1 | წინასწარი მომზადება: 3 წთ | მომზადების დრო: 2 წთ (მიკროტალღური)\n\n"
+            "ინგრედიენტები:\n"
+            "• 1 კოვზი (30 გ) შოკოლადის შრატის ცილა\n"
+            "• 1 ს.კ. კაკაოს ფხვნილი (უშაქრო)\n"
+            "• 1 დიდი კვერცხი\n"
+            "• 2 ს.კ. უშაქრო ვაშლის პიურე (30 გ)\n"
+            "• 1 ს.კ. ნუშის ფქვილი (7 გ)\n"
+            "• ½ ჩ.კ. საცხობი ფხვნილი\n"
+            "• მწიკვი მარილი\n"
+            "• სურვილისამებრ: 10 გ შავი შოკოლადის ჩიფსი, 1 ჩ.კ. თაფლი\n\n"
+            "მომზადების წესი:\n"
+            "1. მიკროტალღურ ღუმელში გამოსაყენებელ ჭიქაში ათქვიფეთ კვერცხი და ვაშლის პიურე.\n"
+            "2. დაამატეთ პროტეინის ფხვნილი, კაკაო, ნუშის ფქვილი, საცხობი ფხვნილი და მარილი. "
+            "აურიეთ გლუვ ცომამდე.\n"
+            "3. სურვილისამებრ ჩააყარეთ შოკოლადის ჩიფსი.\n"
+            "4. მიკროტალღურ ღუმელში გააცხელეთ მაქსიმუმზე 60–90 წამი. "
+            "კექსი ზემოდან მყარი უნდა იყოს, შუაში — ოდნავ ნოტიო.\n"
+            "5. გააჩერეთ 1 წუთი, შემდეგ მიირთვით ჭიქიდანვე ან ამოაბრუნეთ თეფშზე."
+        ),
+    },
+    "Cauliflower Crust Margherita Pizza": {
+        "name_ka": "ყვავილოვანი კომბოსტოს პიცა მარგარიტა",
+        "description_ka": (
+            "ულუფა: 1 (პერსონალური პიცა) | წინასწარი მომზადება: 15 წთ | მომზადების დრო: 20 წთ\n\n"
+            "ინგრედიენტები:\n"
+            "• 250 გ ყვავილოვანი კომბოსტო\n"
+            "• 1 დიდი კვერცხი\n"
+            "• 40 გ გახეხილი მოცარელა (ცომისთვის)\n"
+            "• 1 ს.კ. ნუშის ფქვილი\n"
+            "• ½ ჩ.კ. ნივრის ფხვნილი, ½ ჩ.კ. ხმელი ორეგანო, მწიკვი მარილი\n"
+            "შიგთავსი:\n"
+            "• 3 ს.კ. მარინარას სოუსი\n"
+            "• 50 გ ახალი მოცარელა, დაჭრილი\n"
+            "• 5–6 ახალი რეჰნის ფოთოლი\n"
+            "• ½ ჩ.კ. ზეითუნის ზეთი\n\n"
+            "მომზადების წესი:\n"
+            "1. გააცხელეთ ღუმელი 220 °C-მდე (425 °F).\n"
+            "2. დაქუცმაცეთ ყვავილოვანი კომბოსტო ბრინჯის ფორმამდე. "
+            "მიკროტალღურ ღუმელში გააჩერეთ 4 წუთი, შემდეგ გამოწურეთ მთელი ტენიანობა ხელსახოცით.\n"
+            "3. შეურიეთ კვერცხი, მოცარელა, ნუშის ფქვილი და სუნელები. "
+            "გააბრტყელეთ თხელ წრედ (დაახლოებით 25 სმ) პერგამენტის ქაღალდზე.\n"
+            "4. გამოაცხვეთ ცომი 12–14 წუთი, სანამ არ გახდება ოქროსფერი.\n"
+            "5. წაუსვით სოუსი, დაალაგეთ მოცარელა. გამოაცხვეთ კიდევ 5–6 წუთი.\n"
+            "6. მოაყარეთ ახალი რეჰანი, მოასხით ზეითუნის ზეთი და მიირთვით."
+        ),
+    },
+    "Frozen Greek Yogurt Bark": {
+        "name_ka": "გაყინული ბერძნული იოგურტის ფირფიტა",
+        "description_ka": (
+            "ულუფა: 4 | წინასწარი მომზადება: 10 წთ | გაყინვა: 2 საათი\n\n"
+            "ინგრედიენტები:\n"
+            "• 400 გ ბერძნული იოგურტი (0% ან 2%)\n"
+            "• 2 ს.კ. თაფლი (30 გ)\n"
+            "• 1 ჩ.კ. ვანილის ექსტრაქტი\n"
+            "• 60 გ კენკრის მიქსი\n"
+            "• 20 გ შავი შოკოლადის ჩიფსი\n"
+            "• 15 გ ქოქოსის ფანტელები\n"
+            "• 15 გ დაფშვნილი ფისტა\n\n"
+            "მომზადების წესი:\n"
+            "1. საცხობ ლანგარზე დააფინეთ პერგამენტის ქაღალდი.\n"
+            "2. ჯამში შეურიეთ იოგურტი, თაფლი და ვანილი.\n"
+            "3. გადაიტანეთ ქაღალდზე თხელი ფენით (დაახლოებით 0.5 სმ).\n"
+            "4. ზემოდან დაალაგეთ კენკრა, შოკოლადი, ქოქოსი და ფისტა. "
+            "მსუბუქად დააჭირეთ იოგურტში.\n"
+            "5. გაყინეთ მინიმუმ 2 საათი.\n"
+            "6. დაამტვრიეთ ნაჭრებად. შეინახეთ საყინულეში 2 კვირამდე. "
+            "საკვებ ნივთიერებათა მონაცემები 1 ულუფაზეა."
+        ),
+    },
+    "Protein Ice Cream (3-Ingredient)": {
+        "name_ka": "პროტეინის ნაყინი (3 ინგრედიენტი)",
+        "description_ka": (
+            "ულუფა: 1 | წინასწარი მომზადება: 5 წთ | არ საჭიროებს თერმულ დამუშავებას\n\n"
+            "ინგრედიენტები:\n"
+            "• 2 საშუალო გაყინული ბანანი (დაახლოებით 200 გ, დაჭრილი და გაყინული ერთი ღამით)\n"
+            "• 1 კოვზი (30 გ) ვანილის ან შოკოლადის შრატის ცილა\n"
+            "• 2 ს.კ. უშაქრო ნუშის რძე (30 მლ)\n"
+            "• სურვილისამებრ: 10 გ დაფშვნილი თხილი, 1 ჩ.კ. თაფლი, დარიჩინი\n\n"
+            "მომზადების წესი:\n"
+            "1. ბლენდერში ან საკვების პროცესორში ჩაყარეთ გაყინული ბანანი, "
+            "პროტეინის ფხვნილი და ნუშის რძე.\n"
+            "2. დააბლენდერეთ 30–45 წამი, ერთხელ ჩამოფხეკეთ გვერდები. "
+            "მასა ჯერ ფხვნილივით გამოჩნდება, შემდეგ კრემისებრი გახდება.\n"
+            "3. ზედმეტად არ დააბლენდეროთ — თუ თხევადი გახდა, "
+            "საყინულეში 15 წუთით დადგით.\n"
+            "4. გადაიტანეთ ჯამში, მოაყარეთ შიგთავსი და მაშინვე მიირთვით."
+        ),
+    },
+    "Turkey Lettuce Wrap Tacos": {
+        "name_ka": "ინდაურის სალათის ტაკოსები",
+        "description_ka": (
+            "ულუფა: 1 (3 ტაკო) | წინასწარი მომზადება: 5 წთ | მომზადების დრო: 10 წთ\n\n"
+            "ინგრედიენტები:\n"
+            "• 200 გ მჭლე ინდაურის ფარში\n"
+            "• ½ ჩ.კ. ძირა, ½ ჩ.კ. ჩილის ფხვნილი, ½ ჩ.კ. ნივრის ფხვნილი\n"
+            "• ¼ ჩ.კ. შებოლილი პაპრიკა, მარილი და პილპილი\n"
+            "• 1 ჩ.კ. ზეითუნის ზეთი\n"
+            "• 3 დიდი სალათის ფოთოლი (ტაკოს გარსის ნაცვლად)\n"
+            "• 30 გ სალსა\n"
+            "• 20 გ გახეხილი ყველი\n"
+            "• 1 ს.კ. ბერძნული იოგურტი (არაჟნის ნაცვლად)\n"
+            "• ლაიმის წვენი\n\n"
+            "მომზადების წესი:\n"
+            "1. ტაფაზე გააცხელეთ ზეითუნის ზეთი. დაამატეთ ინდაურის ფარში "
+            "და წვით 5–6 წუთი, დროდადრო ურიეთ.\n"
+            "2. დაამატეთ ძირა, ჩილი, ნივრის ფხვნილი, პაპრიკა, მარილი და პილპილი. "
+            "წვით კიდევ 2 წუთი.\n"
+            "3. გარეცხეთ და შეამშრალეთ სალათის ფოთლები.\n"
+            "4. გადაანაწილეთ შემწვარი ინდაური სამ ფოთოლში.\n"
+            "5. ზემოდან დაადეთ სალსა, ყველი, იოგურტი და მოწურეთ ლაიმი. "
+            "მაშინვე მიირთვით."
         ),
     },
 }

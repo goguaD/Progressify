@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.config import AVATAR_DIR, CORS_ORIGINS, STATIC_DIR
+from app.config import AVATAR_DIR, CORS_ORIGINS, MEAL_IMG_DIR, STATIC_DIR
 from app.database import SessionLocal, engine
 from app.migrations import ensure_challenges_columns, ensure_meals_columns, ensure_users_columns
 from app.models import Base, User
@@ -64,6 +64,7 @@ def _seed_default_meals() -> None:
 
 def create_app() -> FastAPI:
     AVATAR_DIR.mkdir(parents=True, exist_ok=True)
+    MEAL_IMG_DIR.mkdir(parents=True, exist_ok=True)
 
     Base.metadata.create_all(bind=engine)
     ensure_users_columns()

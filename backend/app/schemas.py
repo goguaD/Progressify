@@ -223,7 +223,7 @@ class H2HScore(BaseModel):
 
 # ── Meals ────────────────────────────────────────────────────────────────────
 
-MEAL_GOALS = {"cut", "bulk", "maintain", "general"}
+MEAL_GOALS = {"cut", "bulk", "maintain", "general", "cheat"}
 
 
 class MealOut(BaseModel):

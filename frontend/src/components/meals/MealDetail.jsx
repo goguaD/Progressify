@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import StarRating from './StarRating'
+import { resolveAssetUrl } from '../../api/client'
 
 const GOAL_LABELS = {
   cut: { en: '🔥 Fat Loss / Cut', ka: '🔥 წონის კლება' },
   bulk: { en: '💪 Muscle Gain / Bulk', ka: '💪 მასის მომატება' },
   maintain: { en: '⚖️ Maintenance', ka: '⚖️ შენარჩუნება' },
   general: { en: '🍽️ General', ka: '🍽️ ზოგადი' },
+  cheat: { en: '🍫 Healthy Cheat', ka: '🍫 ჯანსაღი ჩითი' },
 }
 
 export default function MealDetail({ meal, t, onClose, onRate, appLang }) {
@@ -22,7 +24,7 @@ export default function MealDetail({ meal, t, onClose, onRate, appLang }) {
         {meal.image_url && (
           <div
             className="meal-detail-hero"
-            style={{ backgroundImage: `url(${meal.image_url})` }}
+            style={{ backgroundImage: `url(${resolveAssetUrl(meal.image_url)})` }}
           >
             <button className="meal-detail-close" onClick={onClose}>✕</button>
             <div className="meal-detail-lang-toggle">

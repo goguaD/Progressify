@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+import uuid
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
 
+from app.config import ALLOWED_AVATAR_TYPES, MAX_AVATAR_BYTES, MEAL_IMG_DIR
 from app.database import get_db
 from app.deps import get_current_user
 from app.models import Meal, MealRating, User
 from app.repositories.meal_repo import MealRepository
-from app.schemas import MealOut, MealRateRequest
+from app.schemas import MEAL_GOALS, MealOut, MealRateRequest
 from app.services.meal_service import meal_out_dict
 
 router = APIRouter(prefix="/meals", tags=["meals"])
@@ -27,6 +30,62 @@ def list_meals(
         my = repo.get_user_rating(m.id, current.id)
         result.append(meal_out_dict(m, my.score if my else None))
     return result
+
+
+@router.post("", response_model=MealOut)
+async def create_meal(
+    name: str = Form(...),
+    description: str = Form(...),
+    goal: str = Form(...),
+    calories: int = Form(...),
+    protein: float = Form(...),
+    carbs: float = Form(...),
+    fat: float = Form(...),
+    fiber: float | None = Form(None),
+    sugar: float | None = Form(None),
+    name_ka: str | None = Form(None),
+    description_ka: str | None = Form(None),
+    image: UploadFile | None = File(None),
+    db: Session = Depends(get_db),
+    current: User = Depends(get_current_user),
+) -> dict:
+    if goal not in MEAL_GOALS:
+        valid = ", ".join(sorted(MEAL_GOALS))
+        raise HTTPException(status_code=422, detail=f"Goal must be one of: {valid}")
+
+    image_url = None
+    if image and image.filename:
+        if image.content_type not in ALLOWED_AVATAR_TYPES:
+            raise HTTPException(status_code=422, detail="Image must be PNG, JPEG, or WebP.")
+        contents = await image.read()
+        if len(contents) > MAX_AVATAR_BYTES:
+            raise HTTPException(status_code=422, detail="Image must be 5 MB or smaller.")
+        ext = ALLOWED_AVATAR_TYPES[image.content_type]
+        fname = f"{uuid.uuid4().hex}{ext}"
+        MEAL_IMG_DIR.mkdir(parents=True, exist_ok=True)
+        with open(MEAL_IMG_DIR / fname, "wb") as f:
+            f.write(contents)
+        image_url = f"/static/meals/{fname}"
+
+    meal = Meal(
+        name=name,
+        name_ka=name_ka or None,
+        description=description,
+        description_ka=description_ka or None,
+        image_url=image_url,
+        goal=goal,
+        calories=calories,
+        protein=protein,
+        carbs=carbs,
+        fat=fat,
+        fiber=fiber,
+        sugar=sugar,
+        added_by=current.id,
+        is_default=False,
+    )
+    repo = MealRepository(db)
+    repo.create(meal)
+    return meal_out_dict(meal, None)
 
 
 @router.get("/{meal_id}", response_model=MealOut)

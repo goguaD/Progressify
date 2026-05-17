@@ -2524,3 +2524,296 @@ select option {
 .meal-detail-desc .meal-desc-gap {
   height: 8px;
 }
+
+/* ── Meal Carousel ────────────────────────────────────────── */
+
+.meals-carousel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.meals-carousel-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.meals-carousel-counter {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-subtle);
+  margin-right: 4px;
+  min-width: 36px;
+  text-align: center;
+}
+
+.meals-carousel-arrow {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  padding: 0;
+  font-family: inherit;
+}
+
+.meals-carousel-arrow:hover:not(.disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.meals-carousel-arrow.disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.meals-carousel-viewport {
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.meals-carousel-track {
+  display: flex;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.meals-carousel-page {
+  min-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .meals-carousel-page {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .meals-carousel-page {
+    grid-template-columns: 1fr;
+  }
+}
+
+.meals-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.meals-carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.meals-carousel-dot.active {
+  background: var(--accent);
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* ── Add Meal Modal ───────────────────────────────────────── */
+
+.add-meal-modal {
+  background: var(--bg-card);
+  border-radius: 20px;
+  width: 95%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+.add-meal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+}
+
+.add-meal-header h2 {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text);
+}
+
+.add-meal-close {
+  background: var(--bg-input) !important;
+  color: var(--text-muted) !important;
+  position: static !important;
+}
+
+.add-meal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px 24px 24px;
+}
+
+.add-meal-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-subtle);
+  margin-bottom: 6px;
+}
+
+.add-meal-field input[type="text"],
+.add-meal-field input[type="number"],
+.add-meal-field textarea,
+.add-meal-field select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-input);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.add-meal-field input:focus,
+.add-meal-field textarea:focus,
+.add-meal-field select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.add-meal-field textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.add-meal-lang-pills {
+  display: flex;
+  gap: 6px;
+}
+
+.add-meal-lang-pill {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.add-meal-lang-pill.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.add-meal-nutrients-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .add-meal-nutrients-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.add-meal-nutrients-grid input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-input);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.add-meal-nutrients-grid input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.add-meal-image-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.add-meal-image-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.add-meal-image-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.add-meal-image-preview {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.add-meal-error {
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: 8px;
+}
+
+.add-meal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+}

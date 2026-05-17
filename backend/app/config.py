@@ -13,6 +13,7 @@ ONLINE_WINDOW = timedelta(seconds=90)
 
 STATIC_DIR = BASE_DIR / "static"
 AVATAR_DIR = STATIC_DIR / "avatars"
+MEAL_IMG_DIR = STATIC_DIR / "meals"
 
 ALLOWED_AVATAR_TYPES: dict[str, str] = {
     "image/png": ".png",

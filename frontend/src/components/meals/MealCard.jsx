@@ -1,14 +1,18 @@
 import StarRating from './StarRating'
+import { resolveAssetUrl } from '../../api/client'
 
 const GOAL_EMOJI = {
   cut: '🔥',
   bulk: '💪',
   maintain: '⚖️',
   general: '🍽️',
+  cheat: '🍫',
 }
 
-export default function MealCard({ meal, t, onRate, onView }) {
-  const desc = meal.description || ''
+export default function MealCard({ meal, t, onRate, onView, appLang }) {
+  const name = appLang === 'ka' && meal.name_ka ? meal.name_ka : meal.name
+  const rawDesc = appLang === 'ka' && meal.description_ka ? meal.description_ka : meal.description
+  const desc = rawDesc || ''
   const firstLine = desc.split('\n')[0] || ''
   const short = firstLine.length > 100 ? firstLine.slice(0, 100) + '…' : firstLine
 
@@ -16,7 +20,7 @@ export default function MealCard({ meal, t, onRate, onView }) {
     <div className="meal-card" onClick={() => onView(meal)}>
       <div
         className="meal-card-img"
-        style={{ backgroundImage: meal.image_url ? `url(${meal.image_url})` : undefined }}
+        style={{ backgroundImage: meal.image_url ? `url(${resolveAssetUrl(meal.image_url)})` : undefined }}
       >
         <span className="meal-card-goal-badge">
           {GOAL_EMOJI[meal.goal] || '🍽️'} {t[`meals_goal_${meal.goal}`] || meal.goal}
@@ -24,7 +28,7 @@ export default function MealCard({ meal, t, onRate, onView }) {
       </div>
 
       <div className="meal-card-body">
-        <h3 className="meal-card-name">{meal.name}</h3>
+        <h3 className="meal-card-name">{name}</h3>
         <p className="meal-card-desc">
           {short}
           {desc.length > 100 && (

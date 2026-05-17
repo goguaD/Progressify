@@ -162,8 +162,12 @@ class MealRating(Base):
     __tablename__ = "meal_ratings"
 
     id = Column(Integer, primary_key=True, index=True)
-    meal_id = Column(Integer, ForeignKey("meals.id", ondelete="CASCADE"), nullable=False, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    meal_id = Column(
+        Integer, ForeignKey("meals.id", ondelete="CASCADE"), nullable=False, index=True,
+    )
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True,
+    )
     score = Column(Float, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -180,8 +184,12 @@ class MealView(Base):
     __tablename__ = "meal_views"
 
     id = Column(Integer, primary_key=True, index=True)
-    meal_id = Column(Integer, ForeignKey("meals.id", ondelete="CASCADE"), nullable=False, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    meal_id = Column(
+        Integer, ForeignKey("meals.id", ondelete="CASCADE"), nullable=False, index=True,
+    )
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True,
+    )
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     meal = relationship("Meal", back_populates="user_views")
