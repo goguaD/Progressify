@@ -10,12 +10,20 @@ from app.deps import get_current_user, require_admin
 from app.models import User
 from app.repositories.friend_repo import FriendRepository
 from app.repositories.user_repo import UserRepository
+from app.repositories.workout_repo import WorkoutRepository
 from app.schemas import AdminUserOut, ProfileView, PublicUser, UserOut
 from app.services.friend_service import friendship_state
+from app.services.strength_standards import (
+    STRENGTH_STANDARDS,
+    classify_lift,
+    compute_muscle_levels,
+    unit_hint,
+)
 from app.services.user_service import (
     placeholder_activity,
     public_user_dict,
 )
+from app.services.workout_service import plan_summary_dict
 
 router = APIRouter(tags=["users"])
 
@@ -60,6 +68,10 @@ def get_profile(
     state, req_id = friendship_state(friend_repo, current.id, user.id)
     activity = placeholder_activity(user)
 
+    workout_repo = WorkoutRepository(db)
+    active = workout_repo.get_active_plan(user.id)
+    lifts_rows = workout_repo.list_one_rep_maxes(user.id) if active else []
+
     base = public_user_dict(user)
     base["relationship"] = state
     base["pending_request_id"] = req_id
@@ -67,6 +79,49 @@ def get_profile(
     base["current_workout"] = activity["current_workout"]
     base["current_meal_plan"] = activity["current_meal_plan"]
     base["last_workout_text"] = activity["last_activity"]
+
+    muscle_levels: dict[str, str] = {}
+    active_workout: dict | None = None
+    if active:
+        plan = workout_repo.get_by_id(active.plan_id)
+        if plan:
+            raw_lifts = [
+                {"exercise_name": r.exercise_name, "weight_kg": r.weight_kg}
+                for r in lifts_rows
+            ]
+            muscle_levels = compute_muscle_levels(
+                raw_lifts, user.weight, user.gender or "male",
+            )
+            by_name = {r.exercise_name: r for r in lifts_rows}
+            seen: set[str] = set()
+            lifts_summary: list[dict] = []
+            for day in plan.days:
+                for ex in day.exercises:
+                    if ex.name in seen:
+                        continue
+                    seen.add(ex.name)
+                    row = by_name.get(ex.name)
+                    level = None
+                    if row and user.weight and user.gender:
+                        level = classify_lift(
+                            ex.name, row.weight_kg, user.weight, user.gender,
+                        )
+                    lifts_summary.append({
+                        "exercise_name": ex.name,
+                        "weight_kg": row.weight_kg if row else 0.0,
+                        "muscle_group": ex.muscle_group,
+                        "level": level,
+                        "has_standard": ex.name in STRENGTH_STANDARDS,
+                        "unit_hint": unit_hint(ex.name, "en"),
+                        "unit_hint_ka": unit_hint(ex.name, "ka"),
+                    })
+            active_workout = {
+                "plan": plan_summary_dict(plan, None),
+                "lifts": lifts_summary,
+            }
+
+    base["muscle_levels"] = muscle_levels
+    base["active_workout"] = active_workout
     return base
 
 

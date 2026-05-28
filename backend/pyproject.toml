@@ -9,6 +9,8 @@ ignore = ["B008"]
 
 [tool.ruff.lint.per-file-ignores]
 "app/services/meal_service.py" = ["E501", "RUF001"]
+"app/services/workout_service.py" = ["E501", "RUF001", "RUF002"]
+"app/services/strength_standards.py" = ["E501", "RUF002"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["app"]

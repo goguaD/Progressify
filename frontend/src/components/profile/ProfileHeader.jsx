@@ -27,9 +27,7 @@ export default function ProfileHeader({ profile, isMe, t, setMe, onReload }) {
     formData.append('file', file)
     setUploading(true)
     try {
-      const { data } = await api.post('/me/avatar', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+      const { data } = await api.post('/me/avatar', formData)
       localStorage.setItem('user', JSON.stringify(data))
       setMe?.(data)
       onReload()

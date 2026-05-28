@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useApp } from '../contexts/AppContext'
 import api from '../api/client'
 import MealCard from '../components/meals/MealCard'
@@ -39,16 +39,18 @@ export default function MealPlans() {
     return null
   }, [user])
 
-  // Always fetch ALL meals (no server-side sort/filter for sections to work)
-  useEffect(() => {
+  const loadMeals = useCallback(() => {
     setLoading(true)
     const params = { limit: 100 }
     if (goalFilter !== 'all') params.goal = goalFilter
-    api.get('/meals', { params })
+    return api.get('/meals', { params })
       .then(r => setMeals(r.data))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [goalFilter])
+
+  // Always fetch ALL meals (no server-side sort/filter for sections to work)
+  useEffect(() => { loadMeals() }, [loadMeals])
 
   // Whether we're on the default "recommended" view with no goal filter
   const isDefaultView = sort === 'recommended' && goalFilter === 'all'
@@ -150,8 +152,12 @@ export default function MealPlans() {
     }
   }
 
-  const handleMealAdded = (newMeal) => {
-    setMeals(prev => [newMeal, ...prev])
+  const handleMealAdded = () => {
+    if (goalFilter !== 'all') {
+      setGoalFilter('all')
+    } else {
+      loadMeals()
+    }
   }
 
   return (
@@ -344,13 +350,17 @@ function MealCarousel({ title, sub, meals, t, onRate, onView, appLang }) {
           ref={trackRef}
           style={{ transform: `translateX(-${page * 100}%)` }}
         >
-          {Array.from({ length: totalPages }).map((_, pi) => (
-            <div className="meals-carousel-page" key={pi}>
-              {meals.slice(pi * PAGE_SIZE, (pi + 1) * PAGE_SIZE).map(m => (
-                <MealCard key={m.id} meal={m} t={t} onRate={onRate} onView={onView} appLang={appLang} />
-              ))}
-            </div>
-          ))}
+          {Array.from({ length: totalPages }).map((_, pi) => {
+            const items = meals.slice(pi * PAGE_SIZE, (pi + 1) * PAGE_SIZE)
+            const cols = Math.min(items.length, 3)
+            return (
+              <div className="meals-carousel-page" key={pi} style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+                {items.map(m => (
+                  <MealCard key={m.id} meal={m} t={t} onRate={onRate} onView={onView} appLang={appLang} />
+                ))}
+              </div>
+            )
+          })}
         </div>
       </div>
 

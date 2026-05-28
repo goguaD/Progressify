@@ -197,3 +197,193 @@ class MealView(Base):
     __table_args__ = (
         UniqueConstraint("meal_id", "user_id", name="uq_meal_view_user"),
     )
+
+
+class WorkoutPlan(Base):
+    __tablename__ = "workout_plans"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    name_ka = Column(String, nullable=True)
+    description = Column(Text, nullable=False)
+    description_ka = Column(Text, nullable=True)
+    image_url = Column(String, nullable=True)
+    days_per_week = Column(Integer, nullable=False, index=True)
+    split_type = Column(String, nullable=False)
+    level = Column(String, nullable=False, default="intermediate")
+    views = Column(Integer, nullable=False, default=0)
+    rating_sum = Column(Float, nullable=False, default=0.0)
+    rating_count = Column(Integer, nullable=False, default=0)
+    is_default = Column(Boolean, nullable=False, default=False)
+    added_by = Column(
+        Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True,
+    )
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    days = relationship(
+        "WorkoutDay",
+        back_populates="plan",
+        cascade="all, delete-orphan",
+        order_by="WorkoutDay.day_number",
+    )
+    author = relationship("User", foreign_keys=[added_by])
+    ratings = relationship(
+        "WorkoutPlanRating",
+        back_populates="plan",
+        cascade="all, delete-orphan",
+    )
+    user_views = relationship(
+        "WorkoutPlanView",
+        back_populates="plan",
+        cascade="all, delete-orphan",
+    )
+
+
+class WorkoutDay(Base):
+    __tablename__ = "workout_days"
+
+    id = Column(Integer, primary_key=True, index=True)
+    plan_id = Column(
+        Integer, ForeignKey("workout_plans.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    day_number = Column(Integer, nullable=False)
+    name = Column(String, nullable=False)
+    name_ka = Column(String, nullable=True)
+    focus = Column(String, nullable=True)
+
+    plan = relationship("WorkoutPlan", back_populates="days")
+    exercises = relationship(
+        "Exercise",
+        back_populates="day",
+        cascade="all, delete-orphan",
+        order_by="Exercise.order_index",
+    )
+
+
+class Exercise(Base):
+    __tablename__ = "exercises"
+
+    id = Column(Integer, primary_key=True, index=True)
+    day_id = Column(
+        Integer, ForeignKey("workout_days.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    order_index = Column(Integer, nullable=False, default=0)
+    name = Column(String, nullable=False)
+    name_ka = Column(String, nullable=True)
+    description = Column(Text, nullable=False)
+    description_ka = Column(Text, nullable=True)
+    image_url = Column(String, nullable=True)
+    sets = Column(Integer, nullable=False, default=3)
+    rep_low = Column(Integer, nullable=False, default=8)
+    rep_high = Column(Integer, nullable=False, default=12)
+    rest_seconds = Column(Integer, nullable=False, default=90)
+    primary_purpose = Column(String, nullable=False, default="hypertrophy")
+    muscle_group = Column(String, nullable=False, default="general")
+    # JSON-encoded list of {"slug": str, "intensity": "low"|"medium"|"high"}.
+    # When present, it overrides the default EXERCISE_MUSCLES lookup so user-
+    # submitted exercises can specify exactly which muscles they target and at
+    # what intensity (drives the muscle-map shading on the frontend).
+    muscle_targets = Column(Text, nullable=True)
+
+    day = relationship("WorkoutDay", back_populates="exercises")
+
+
+class WorkoutPlanRating(Base):
+    __tablename__ = "workout_plan_ratings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    plan_id = Column(
+        Integer, ForeignKey("workout_plans.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    score = Column(Float, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    plan = relationship("WorkoutPlan", back_populates="ratings")
+    user = relationship("User")
+
+    __table_args__ = (
+        UniqueConstraint("plan_id", "user_id", name="uq_wplan_rating_user"),
+        CheckConstraint(
+            "score >= 0 AND score <= 5", name="ck_wplan_rating_range",
+        ),
+    )
+
+
+class WorkoutPlanView(Base):
+    __tablename__ = "workout_plan_views"
+
+    id = Column(Integer, primary_key=True, index=True)
+    plan_id = Column(
+        Integer, ForeignKey("workout_plans.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    plan = relationship("WorkoutPlan", back_populates="user_views")
+
+    __table_args__ = (
+        UniqueConstraint("plan_id", "user_id", name="uq_wplan_view_user"),
+    )
+
+
+class UserActiveWorkoutPlan(Base):
+    """The single workout plan a user has adopted as their training programme."""
+
+    __tablename__ = "user_active_workout_plans"
+
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    plan_id = Column(
+        Integer, ForeignKey("workout_plans.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(), onupdate=func.now(),
+    )
+
+    user = relationship("User")
+    plan = relationship("WorkoutPlan")
+
+
+class UserOneRepMax(Base):
+    """A user-reported one-rep-max (1RM) for an exercise, in kilograms.
+
+    Keyed by ``exercise_name`` rather than ``exercise_id`` because the same
+    movement (e.g. Barbell Bench Press) may appear in multiple days of the
+    plan as separate rows but represents a single lift for the lifter.
+    """
+
+    __tablename__ = "user_one_rep_max"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    exercise_name = Column(String, nullable=False, index=True)
+    weight_kg = Column(Float, nullable=False)
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(), onupdate=func.now(),
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "exercise_name", name="uq_user_exercise_1rm",
+        ),
+    )

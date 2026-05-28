@@ -139,6 +139,8 @@ class ProfileView(PublicUser):
     current_workout: str | None = None
     current_meal_plan: str | None = None
     last_workout_text: str | None = None
+    muscle_levels: dict[str, str] = {}
+    active_workout: dict | None = None
 
 
 class FriendRequestCreate(BaseModel):
@@ -261,4 +263,197 @@ class MealRateRequest(BaseModel):
             raise ValueError("Score must be between 0 and 5.")
         if (v * 2) != int(v * 2):
             raise ValueError("Score must be in 0.5 increments.")
+        return v
+
+
+# ── Workouts ─────────────────────────────────────────────────────────────────
+
+WORKOUT_PURPOSES = {"strength", "hypertrophy", "endurance"}
+WORKOUT_LEVELS = {"beginner", "intermediate", "advanced"}
+
+
+class MuscleTarget(BaseModel):
+    slug: str
+    intensity: Literal["low", "medium", "high"]
+
+
+class ExerciseOut(BaseModel):
+    id: int
+    order_index: int
+    name: str
+    name_ka: str | None = None
+    description: str
+    description_ka: str | None = None
+    image_url: str | None
+    sets: int
+    rep_low: int
+    rep_high: int
+    rest_seconds: int
+    primary_purpose: str
+    muscle_group: str
+    muscle_targets: list[MuscleTarget] = []
+    unit_hint: str | None = None
+    unit_hint_ka: str | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class WorkoutDayOut(BaseModel):
+    id: int
+    day_number: int
+    name: str
+    name_ka: str | None = None
+    focus: str | None = None
+    exercises: list[ExerciseOut]
+
+    model_config = {"from_attributes": True}
+
+
+class WorkoutPlanOut(BaseModel):
+    id: int
+    name: str
+    name_ka: str | None = None
+    description: str
+    description_ka: str | None = None
+    image_url: str | None
+    days_per_week: int
+    split_type: str
+    level: str
+    views: int
+    rating: float
+    rating_count: int
+    my_rating: float | None = None
+    is_default: bool
+    added_by_username: str | None = None
+    created_at: datetime | None
+
+    model_config = {"from_attributes": True}
+
+
+class WorkoutPlanDetail(WorkoutPlanOut):
+    days: list[WorkoutDayOut]
+
+
+class WorkoutRateRequest(BaseModel):
+    score: float
+
+    @field_validator("score")
+    @classmethod
+    def _valid_workout_score(cls, v: float) -> float:
+        if v < 0 or v > 5:
+            raise ValueError("Score must be between 0 and 5.")
+        if (v * 2) != int(v * 2):
+            raise ValueError("Score must be in 0.5 increments.")
+        return v
+
+
+# ── User active plan + 1RM ───────────────────────────────────────────────────
+
+class OneRepMaxItem(BaseModel):
+    exercise_name: str
+    weight_kg: float
+
+    @field_validator("weight_kg")
+    @classmethod
+    def _valid_weight(cls, v: float) -> float:
+        if v < 0 or v > 1000:
+            raise ValueError("weight_kg must be between 0 and 1000.")
+        return v
+
+
+class OneRepMaxOut(BaseModel):
+    exercise_name: str
+    weight_kg: float
+    muscle_group: str | None = None
+    level: str | None = None
+    has_standard: bool = False
+    unit_hint: str | None = None
+    unit_hint_ka: str | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class SetActivePlanRequest(BaseModel):
+    plan_id: int
+    lifts: list[OneRepMaxItem] = []
+
+
+class UpdateLiftsRequest(BaseModel):
+    lifts: list[OneRepMaxItem]
+
+
+class ActivePlanOut(BaseModel):
+    plan: WorkoutPlanDetail
+    lifts: list[OneRepMaxOut]
+    muscle_levels: dict[str, str]
+    bodyweight_kg: float | None
+
+
+# ── User-submitted workout plans ────────────────────────────────────────────
+
+class ExerciseCreate(BaseModel):
+    name: str
+    name_ka: str | None = None
+    description: str = ""
+    description_ka: str | None = None
+    sets: int = 3
+    rep_low: int = 8
+    rep_high: int = 12
+    rest_seconds: int = 90
+    primary_purpose: Literal["strength", "hypertrophy", "endurance"] = "hypertrophy"
+    muscle_group: str = "general"
+    muscle_targets: list[MuscleTarget] = []
+
+    @field_validator("sets")
+    @classmethod
+    def _valid_sets(cls, v: int) -> int:
+        if v < 1 or v > 20:
+            raise ValueError("sets must be between 1 and 20.")
+        return v
+
+    @field_validator("rep_low")
+    @classmethod
+    def _valid_rep_low(cls, v: int) -> int:
+        if v < 1 or v > 100:
+            raise ValueError("rep_low must be between 1 and 100.")
+        return v
+
+    @field_validator("rep_high")
+    @classmethod
+    def _valid_rep_high(cls, v: int) -> int:
+        if v < 1 or v > 100:
+            raise ValueError("rep_high must be between 1 and 100.")
+        return v
+
+    @field_validator("rest_seconds")
+    @classmethod
+    def _valid_rest(cls, v: int) -> int:
+        if v < 0 or v > 1200:
+            raise ValueError("rest_seconds must be between 0 and 1200.")
+        return v
+
+
+class DayCreate(BaseModel):
+    day_number: int
+    name: str
+    name_ka: str | None = None
+    focus: str | None = None
+    exercises: list[ExerciseCreate]
+
+
+class WorkoutPlanCreate(BaseModel):
+    name: str
+    name_ka: str | None = None
+    description: str = ""
+    description_ka: str | None = None
+    days_per_week: int
+    split_type: str = "custom"
+    level: Literal["beginner", "intermediate", "advanced"] = "intermediate"
+    days: list[DayCreate]
+
+    @field_validator("days_per_week")
+    @classmethod
+    def _valid_dpw(cls, v: int) -> int:
+        if v < 1 or v > 7:
+            raise ValueError("days_per_week must be between 1 and 7.")
         return v

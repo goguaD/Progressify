@@ -72,9 +72,7 @@ export default function AddMealModal({ t, appLang, onClose, onAdded }) {
 
     setSubmitting(true)
     try {
-      const r = await api.post('/meals', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+      const r = await api.post('/meals', fd)
       onAdded(r.data)
       onClose()
     } catch (err) {

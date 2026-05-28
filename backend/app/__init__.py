@@ -2,11 +2,19 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.config import AVATAR_DIR, CORS_ORIGINS, MEAL_IMG_DIR, STATIC_DIR
+from app.config import AVATAR_DIR, CORS_ORIGINS, MEAL_IMG_DIR, STATIC_DIR, WORKOUT_IMG_DIR
 from app.database import SessionLocal, engine
-from app.migrations import ensure_challenges_columns, ensure_meals_columns, ensure_users_columns
+from app.migrations import (
+    ensure_challenges_columns,
+    ensure_meals_columns,
+    ensure_user_active_workout_tables,
+    ensure_users_columns,
+    ensure_workouts_extra_tables,
+    ensure_workouts_tables,
+    ensure_workouts_user_columns,
+)
 from app.models import Base, User
-from app.routers import auth, challenges, friends, meals, users
+from app.routers import auth, challenges, friends, meals, users, workouts
 from app.services import auth_service
 
 
@@ -62,16 +70,51 @@ def _seed_default_meals() -> None:
         db.close()
 
 
+def _seed_default_workout_plans() -> None:
+    from app.models import WorkoutPlan
+    from app.services.workout_service import DEFAULT_PLANS, build_plan_models
+
+    db = SessionLocal()
+    try:
+        # Strategy: blow away all default plans and rebuild from spec. Cascade
+        # handles days + exercises. Views on default plans aren't user data we
+        # care about preserving across seed changes.
+        existing_plans = (
+            db.query(WorkoutPlan)
+            .filter(WorkoutPlan.is_default == True)  # noqa: E712
+            .all()
+        )
+        existing_views = {p.name: p.views for p in existing_plans}
+        for p in existing_plans:
+            db.delete(p)
+        db.flush()
+
+        for spec in DEFAULT_PLANS:
+            plan = build_plan_models(spec)
+            prev_views = existing_views.get(spec["name"], 0)
+            plan.views = prev_views  # type: ignore[assignment]
+            db.add(plan)
+        db.commit()
+    finally:
+        db.close()
+
+
 def create_app() -> FastAPI:
     AVATAR_DIR.mkdir(parents=True, exist_ok=True)
     MEAL_IMG_DIR.mkdir(parents=True, exist_ok=True)
+    WORKOUT_IMG_DIR.mkdir(parents=True, exist_ok=True)
 
     Base.metadata.create_all(bind=engine)
     ensure_users_columns()
     ensure_challenges_columns()
     ensure_meals_columns()
+    ensure_workouts_tables()
+    ensure_workouts_extra_tables()
+    ensure_workouts_user_columns()
+    ensure_user_active_workout_tables()
     _seed_admin()
     _seed_default_meals()
+    _seed_default_workout_plans()
 
     app = FastAPI(title="Progressify API", version="2.0.0")
 
@@ -90,6 +133,8 @@ def create_app() -> FastAPI:
     app.include_router(friends.router)
     app.include_router(challenges.router)
     app.include_router(meals.router)
+    app.include_router(workouts.router)
+    app.include_router(workouts.me_router)
 
     @app.get("/")
     def root() -> dict:

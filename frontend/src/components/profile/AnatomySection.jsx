@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import BodyFigure, { LEVELS, LEVEL_COLORS } from '../BodyFigure'
 import MuscleChart from '../MuscleChart'
+import OneRepMaxStats from './OneRepMaxStats'
 
 const FRONT_MUSCLES = [
   'chest', 'biceps', 'deltoids', 'abs', 'obliques',
@@ -14,8 +15,15 @@ const BACK_MUSCLES = [
 
 const ALL_MUSCLES = [...FRONT_MUSCLES, ...BACK_MUSCLES]
 
-export default function AnatomySection({ profile, t }) {
+export default function AnatomySection({
+  profile, t,
+  editable = false,
+  onUpdateLifts,
+}) {
   const [view, setView] = useState('front')
+  const muscleLevels = profile.muscle_levels || {}
+  const hasData = Object.keys(muscleLevels).length > 0
+  const lifts = profile.active_workout?.lifts || []
 
   return (
     <div className="anatomy-card">
@@ -44,11 +52,11 @@ export default function AnatomySection({ profile, t }) {
             <BodyFigure
               gender={profile.gender}
               view={view}
-              muscles={profile.muscle_levels || {}}
+              muscles={muscleLevels}
             />
           </div>
           <MuscleChart
-            muscleLevels={profile.muscle_levels || {}}
+            muscleLevels={muscleLevels}
             totalGroups={ALL_MUSCLES.length}
             t={t}
           />
@@ -68,7 +76,8 @@ export default function AnatomySection({ profile, t }) {
 
           <div className="muscle-list">
             {(view === 'front' ? FRONT_MUSCLES : BACK_MUSCLES).map((slug) => {
-              const level = (profile.muscle_levels || {})[slug === 'upper_back' ? 'upper-back' : slug === 'lower_back' ? 'lower-back' : slug]
+              const key = slug === 'upper_back' ? 'upper-back' : slug === 'lower_back' ? 'lower-back' : slug
+              const level = muscleLevels[key]
               return (
                 <div key={slug} className="muscle-row">
                   <span className="muscle-name">{t[`muscle_${slug}`]}</span>
@@ -83,6 +92,24 @@ export default function AnatomySection({ profile, t }) {
             })}
           </div>
         </div>
+
+        <OneRepMaxStats
+          lifts={lifts}
+          t={t}
+          editable={editable}
+          onUpdate={onUpdateLifts}
+        />
+      </div>
+
+      <div className="anatomy-disclaimer">
+        <span className="anatomy-disclaimer-icon">ℹ️</span>
+        <span>
+          {hasData
+            ? (t.profile_anatomy_disclaimer
+               || 'Development tiers are estimated from your bodyweight and self-reported one-rep maxes, calibrated against published strength standards for trained populations.')
+            : (t.profile_anatomy_disclaimer_empty
+               || 'Add a workout plan and submit your one-rep maxes to see your development tiers. Estimates use bodyweight and lift data calibrated against published strength standards.')}
+        </span>
       </div>
     </div>
   )
