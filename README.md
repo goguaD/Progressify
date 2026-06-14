@@ -1,19 +1,38 @@
 # Progressify
 
-Progressify is a web application designed to support users in their fitness journey through workout planning, diet guidance, progress tracking, and simple social features.
+A bilingual (Georgian / English) fitness web platform with workout & meal planning, progress tracking, social features, challenges, BMI analysis, and an admin panel.
 
 The project is split into two parts:
 
 - **`backend/`** — FastAPI + SQLite (Python)
 - **`frontend/`** — React + Vite (JavaScript)
 
-You need **both** running at the same time, in **two separate terminals**.
+Both must be running at the same time in **two separate terminals**.
+
+---
+
+## Features
+
+- **Authentication** — JWT-based register/login; two-step signup (personal info + physical stats including age)
+- **Workout plans** — browse, filter, rate, set active plan; 1RM tracking; strength-standard classification (Beginner → Elite)
+- **Meal plans** — browse, filter, rate; full macro breakdown (calories, protein, carbs, fat, fibre, sugar)
+- **Social feed** — trending & new workouts/meals, friends' PRs, muscle achievements, challenge results
+- **Friends** — send/accept/reject requests, view friends list
+- **Challenges** — H2H challenges between friends with deadlines and results
+- **BMI analysis** — speedometer-style SVG gauge with 6 zones, healthy weight range, BMI Prime
+- **Anatomy map** — interactive muscle map showing strength level per muscle group
+- **Notifications** — friend requests, challenges, PRs, muscle achievements, admin reports
+- **Online friends sidebar** — live list of who's currently active
+- **Report system** — users report meals/workouts; admin reviews and acts on them
+- **Admin panel** — manage users, delete content, review reports (admin-only nav link)
+- **Dark / Light theme** — full theme switching
+- **Georgian / English UI** — full i18n, switchable per-session and per-modal
 
 ---
 
 ## Prerequisites
 
-- **Python 3.10+** (`python3 --version`)
+- **Python 3.10 – 3.12** (`python3 --version`)
 - **Node.js 18+** and **npm** (`node --version`, `npm --version`)
 - **git**
 
@@ -31,14 +50,15 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-You should see:
+Expected output:
 
 ```
 Uvicorn running on http://127.0.0.1:8000
 ✅ Admin user created: admin@progressify.ge / admin123
 ```
 
-Verify it works by opening <http://localhost:8000/> in the browser — you should see `{"message": "Progressify API is running"}`. The interactive API docs live at <http://localhost:8000/docs>.
+Verify by opening <http://localhost:8000/> — you should see `{"message": "Progressify API is running"}`.  
+Interactive API docs: <http://localhost:8000/docs>
 
 **Leave this terminal running.**
 
@@ -52,20 +72,18 @@ npm install
 npm run dev
 ```
 
-You should see:
+Expected output:
 
 ```
 VITE vX.X.X  ready in XXX ms
 ➜  Local:   http://localhost:5173/
 ```
 
-Open <http://localhost:5173> in your browser. You should be able to register, log in, and use the app.
+Open <http://localhost:5173> in your browser.
 
 ---
 
 ## Daily use (after first-time setup)
-
-You don't need to reinstall every time. Just start both servers.
 
 ### Terminal #1 — backend
 
@@ -91,39 +109,36 @@ The backend auto-seeds an admin user on first run:
 - **Email:** `admin@progressify.ge`
 - **Password:** `admin123`
 
-> Note: this email is reserved for the seeded admin. Use a different email when testing the registration form.
+> Use a different email when testing registration. The admin link appears in the top navigation bar only for admin accounts.
 
 ---
 
 ## Troubleshooting
 
-### "რეგისტრაცია ვერ მოხერხდა" / generic error on registration
+### "რეგისტრაცია ვერ მოხერხდა" / error on registration
 
-This almost always means the backend is **not running**. Check terminal #1:
-
-- Is `uvicorn` still running? If it crashed, scroll up to read the error.
-- Open <http://localhost:8000/> in the browser. If it doesn't load, the backend is down.
+The backend is likely not running. Check terminal #1 and open <http://localhost:8000/>.
 
 ### `npm error ENOENT ... package.json` in `backend/`
 
-You ran an `npm` command in the wrong directory. `npm` belongs in `frontend/`. `python` / `uvicorn` belong in `backend/`.
+You ran `npm` in the wrong folder. `npm` belongs in `frontend/`; `uvicorn` belongs in `backend/`.
 
 ### Port already in use
 
-- **Backend (port 8000):** `uvicorn main:app --reload --port 8001` (then update `baseURL` in `frontend/src/api/client.js`).
-- **Frontend (port 5173):** Vite will offer the next free port automatically.
+- **Backend (8000):** `uvicorn main:app --reload --port 8001` then update `baseURL` in `frontend/src/api/client.js`.
+- **Frontend (5173):** Vite picks the next free port automatically.
 
 ### Reset the database
-
-If the DB gets into a bad state, delete it — it will be recreated and reseeded on next backend start:
 
 ```bash
 rm backend/progressify.db
 ```
 
-### `bcrypt` / `passlib` errors at backend startup
+The DB is recreated and re-seeded on next backend start.
 
-Make sure the venv is active and dependencies are installed cleanly:
+### `bcrypt` / `pydantic-core` build errors
+
+Make sure you're on Python 3.10–3.12 and the venv is active:
 
 ```bash
 cd backend
@@ -136,23 +151,50 @@ pip install -r requirements.txt --force-reinstall
 ## Project layout
 
 ```
-progressify/
+Progressify/
 ├── backend/
-│   ├── main.py             # FastAPI app + routes
-│   ├── auth.py             # password hashing + JWT
-│   ├── database.py         # SQLAlchemy engine + session
-│   ├── models.py           # ORM models
-│   ├── schemas.py          # Pydantic schemas
-│   ├── requirements.txt
-│   └── progressify.db      # auto-generated SQLite DB (gitignored)
-└── frontend/
-    ├── src/
-    │   ├── pages/          # Login, SignUp, Main
-    │   ├── components/
-    │   ├── contexts/
-    │   ├── api/client.js   # axios instance, baseURL = http://localhost:8000
-    │   └── i18n.js
-    ├── index.html
-    ├── package.json
-    └── vite.config.js
+│   ├── main.py                  # entry point
+│   └── app/
+│       ├── __init__.py          # FastAPI app, CORS, migrations, router registration
+│       ├── models.py            # SQLAlchemy ORM models
+│       ├── schemas.py           # Pydantic schemas
+│       ├── database.py          # engine + session
+│       ├── auth.py              # password hashing + JWT
+│       ├── migrations.py        # forward-only schema migrations
+│       ├── seed.py              # admin user seed
+│       ├── routers/
+│       │   ├── auth.py          # register, login
+│       │   ├── users.py         # profile, avatar, admin endpoints
+│       │   ├── workouts.py      # workout plans, 1RM, active plan
+│       │   ├── meals.py         # meal plans, ratings, reports
+│       │   ├── friends.py       # friend requests
+│       │   ├── challenges.py    # H2H challenges
+│       │   └── feed.py          # social feed, notifications, online friends
+│       └── services/
+│           ├── user_service.py
+│           ├── workout_service.py
+│           └── meal_service.py
+├── frontend/
+│   └── src/
+│       ├── pages/
+│       │   ├── Home.jsx         # social feed
+│       │   ├── Workouts.jsx
+│       │   ├── MealPlans.jsx
+│       │   ├── Friends.jsx
+│       │   ├── Challenges.jsx
+│       │   ├── Profile.jsx
+│       │   ├── Admin.jsx        # admin-only
+│       │   ├── Login.jsx
+│       │   └── SignUp.jsx
+│       ├── components/
+│       │   ├── Header.jsx
+│       │   ├── ReportModal.jsx
+│       │   ├── workouts/        # WorkoutDetail, AddPlanToProfileModal, ...
+│       │   ├── meals/           # MealDetail, ...
+│       │   └── profile/         # BMIGauge.jsx, AnatomySection.jsx, ...
+│       ├── contexts/
+│       │   └── AppContext.jsx   # language, theme
+│       ├── api/client.js        # axios instance (baseURL: http://localhost:8000)
+│       └── i18n.js              # Georgian / English translation strings
+└── README.md
 ```
