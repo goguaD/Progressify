@@ -23,6 +23,7 @@ class UserCreate(BaseModel):
     password: str
     weight: float | None = None
     height: float | None = None
+    age: int | None = None
     goal: str | None = None
     gender: str
 
@@ -59,6 +60,7 @@ class UserOut(BaseModel):
     email: str
     weight: float | None
     height: float | None
+    age: int | None
     goal: str | None
     gender: str | None
     avatar_url: str | None
@@ -79,6 +81,7 @@ class AdminUserOut(BaseModel):
     password_hash: str
     weight: float | None
     height: float | None
+    age: int | None
     goal: str | None
     gender: str | None
     avatar_url: str | None

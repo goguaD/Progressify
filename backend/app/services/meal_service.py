@@ -24,6 +24,7 @@ def meal_out_dict(meal: Meal, my_rating: float | None = None) -> dict:
         "rating": avg,
         "rating_count": rc,
         "my_rating": my_rating,
+        "added_by": meal.added_by,
         "added_by_username": (
             meal.author.username if meal.author else None
         ),

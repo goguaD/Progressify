@@ -69,6 +69,7 @@ def plan_summary_dict(
         "rating_count": rc,
         "my_rating": my_rating,
         "is_default": plan.is_default,
+        "added_by": plan.added_by,
         "added_by_username": (
             plan.author.username
             if getattr(plan, "author", None) is not None

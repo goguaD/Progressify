@@ -22,6 +22,7 @@ def public_user_dict(user: User) -> dict:
         "goal": user.goal,
         "weight": user.weight,
         "height": user.height,
+        "age": user.age,
         "gender": user.gender,
         "avatar_url": user.avatar_url,
         "role": user.role,

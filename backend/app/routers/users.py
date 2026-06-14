@@ -180,3 +180,94 @@ def get_all_users(
     _: User = Depends(require_admin),
 ) -> list[User]:
     return UserRepository(db).list_all()
+
+
+@router.delete("/admin/users/{user_id}")
+def admin_delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current: User = Depends(require_admin),
+) -> dict:
+    if user_id == current.id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    repo = UserRepository(db)
+    target = repo.get_by_id(user_id)
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(target)
+    db.commit()
+    return {"ok": True}
+
+
+@router.delete("/admin/meals/{meal_id}")
+def admin_delete_meal(
+    meal_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_admin),
+) -> dict:
+    from app.models import Meal
+    meal = db.query(Meal).filter(Meal.id == meal_id).first()
+    if not meal:
+        raise HTTPException(status_code=404, detail="Meal not found")
+    db.delete(meal)
+    db.commit()
+    return {"ok": True}
+
+
+@router.delete("/admin/workouts/{plan_id}")
+def admin_delete_workout(
+    plan_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_admin),
+) -> dict:
+    from app.models import WorkoutPlan
+    plan = db.query(WorkoutPlan).filter(WorkoutPlan.id == plan_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="Workout plan not found")
+    db.delete(plan)
+    db.commit()
+    return {"ok": True}
+
+
+@router.get("/admin/reports")
+def admin_get_reports(
+    reviewed: bool = False,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_admin),
+) -> list[dict]:
+    from app.models import Report
+    rows = (
+        db.query(Report)
+        .filter(Report.reviewed == reviewed)
+        .order_by(Report.created_at.desc())
+        .all()
+    )
+    return [
+        {
+            "id": r.id,
+            "reporter_username": r.reporter.username if r.reporter else None,
+            "target_type": r.target_type,
+            "target_id": r.target_id,
+            "target_name": r.target_name,
+            "reason": r.reason,
+            "notes": r.notes,
+            "reviewed": r.reviewed,
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+        }
+        for r in rows
+    ]
+
+
+@router.patch("/admin/reports/{report_id}/reviewed")
+def admin_mark_report_reviewed(
+    report_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_admin),
+) -> dict:
+    from app.models import Report
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    report.reviewed = True
+    db.commit()
+    return {"ok": True}

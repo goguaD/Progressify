@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useApp } from '../contexts/AppContext'
 import api from '../api/client'
 import { translations } from '../i18n'
@@ -16,6 +17,8 @@ const FREQUENCY_OPTIONS = [
 
 export default function Workouts() {
   const { t, lang } = useApp()
+  const [searchParams] = useSearchParams()
+  const currentUser = JSON.parse(localStorage.getItem('user') || 'null')
   const [plans, setPlans] = useState([])
   const [loading, setLoading] = useState(true)
   const [frequency, setFrequency] = useState('all')
@@ -36,6 +39,15 @@ export default function Workouts() {
   }, [frequency])
 
   useEffect(() => { loadPlans() }, [loadPlans])
+
+  // Auto-open a plan when ?open=<id> is in the URL
+  useEffect(() => {
+    const openId = searchParams.get('open')
+    if (!openId || plans.length === 0) return
+    const target = plans.find((p) => p.id === parseInt(openId, 10))
+    if (target) handleView(target)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plans, searchParams])
 
   useEffect(() => {
     api.get('/me/workout-plan')
@@ -181,6 +193,8 @@ export default function Workouts() {
           onRate={handleRate}
           onAddToProfile={(p, modalLang) => { setPlanForLifts(p); setDetailLang(modalLang || lang) }}
           isActive={activePlan?.plan?.id === selectedPlan.id}
+          currentUser={currentUser}
+          onDeleted={(id) => { setPlans((prev) => prev.filter((p) => p.id !== id)); setSelectedPlan(null) }}
         />
       )}
 

@@ -9,6 +9,7 @@ import Workouts from './pages/Workouts'
 import Friends from './pages/Friends'
 import Challenges from './pages/Challenges'
 import Profile from './pages/Profile'
+import Admin from './pages/Admin'
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('token')
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/friends" element={<Friends />} />
             <Route path="/challenges" element={<Challenges />} />
             <Route path="/u/:username" element={<Profile />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/main" element={<Navigate to="/" replace />} />
           </Route>
 

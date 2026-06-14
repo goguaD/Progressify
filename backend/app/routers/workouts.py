@@ -16,7 +16,14 @@ from sqlalchemy.orm import Session
 from app.config import ALLOWED_AVATAR_TYPES, MAX_AVATAR_BYTES, WORKOUT_IMG_DIR
 from app.database import get_db
 from app.deps import get_current_user
-from app.models import Exercise, MuscleAchievement, User, WorkoutDay, WorkoutPlan, WorkoutPlanRating
+from pydantic import BaseModel as PydanticBase
+
+from app.models import Exercise, MuscleAchievement, Report, User, WorkoutDay, WorkoutPlan, WorkoutPlanRating
+
+
+class _ReportRequest(PydanticBase):
+    reason: str
+    notes: str | None = None
 from app.repositories.workout_repo import WorkoutRepository
 from app.schemas import (
     ActivePlanOut,
@@ -320,6 +327,47 @@ def rate_plan(
     repo.save()
     repo.refresh(plan)
     return plan_detail_dict(plan, body.score)
+
+
+@router.delete("/{plan_id}")
+def delete_workout_plan(
+    plan_id: int,
+    db: Session = Depends(get_db),
+    current: User = Depends(get_current_user),
+) -> dict:
+    repo = WorkoutRepository(db)
+    plan = repo.get_by_id(plan_id)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Workout plan not found")
+    if current.role != "admin" and plan.added_by != current.id:
+        raise HTTPException(status_code=403, detail="You can only delete your own workout plans")
+    db.delete(plan)
+    db.commit()
+    return {"ok": True}
+
+
+@router.post("/{plan_id}/report")
+def report_workout_plan(
+    plan_id: int,
+    body: _ReportRequest,
+    db: Session = Depends(get_db),
+    current: User = Depends(get_current_user),
+) -> dict:
+    repo = WorkoutRepository(db)
+    plan = repo.get_by_id(plan_id)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Workout plan not found")
+    report = Report(
+        reporter_id=current.id,
+        target_type="workout",
+        target_id=plan_id,
+        target_name=plan.name,
+        reason=body.reason,
+        notes=body.notes,
+    )
+    db.add(report)
+    db.commit()
+    return {"ok": True}
 
 
 # ── /me/workout-plan endpoints ───────────────────────────────────────────────

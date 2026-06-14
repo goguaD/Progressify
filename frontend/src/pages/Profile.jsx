@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import api from '../api/client'
 import AnatomySection from '../components/profile/AnatomySection'
+import BMIGauge from '../components/profile/BMIGauge'
 import MyWorkoutPlan from '../components/profile/MyWorkoutPlan'
 import ProfileActions from '../components/profile/ProfileActions'
 import ProfileHeader from '../components/profile/ProfileHeader'
@@ -93,6 +94,13 @@ export default function Profile() {
           <ProfileActions profile={profile} busy={busy} withBusy={withBusy} t={t} />
         </div>
       )}
+
+      <BMIGauge
+        weight={profile.weight}
+        height={profile.height}
+        age={profile.age}
+        t={t}
+      />
 
       <AnatomySection
         profile={profile}

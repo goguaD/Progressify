@@ -5,9 +5,11 @@ from fastapi.staticfiles import StaticFiles
 from app.config import AVATAR_DIR, CORS_ORIGINS, MEAL_IMG_DIR, STATIC_DIR, WORKOUT_IMG_DIR
 from app.database import SessionLocal, engine
 from app.migrations import (
+    ensure_age_column,
     ensure_challenges_columns,
     ensure_meals_columns,
     ensure_muscle_achievements_table,
+    ensure_reports_table,
     ensure_user_active_workout_tables,
     ensure_users_columns,
     ensure_workouts_extra_tables,
@@ -113,7 +115,9 @@ def create_app() -> FastAPI:
     ensure_workouts_extra_tables()
     ensure_workouts_user_columns()
     ensure_user_active_workout_tables()
+    ensure_age_column()
     ensure_muscle_achievements_table()
+    ensure_reports_table()
     _seed_admin()
     _seed_default_meals()
     _seed_default_workout_plans()

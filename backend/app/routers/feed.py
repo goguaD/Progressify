@@ -11,6 +11,7 @@ from app.models import (
     Meal,
     MealView,
     MuscleAchievement,
+    Report,
     User,
     UserOneRepMax,
     WorkoutPlan,
@@ -418,6 +419,33 @@ def get_notifications(
                 "new_level": ach.new_level,
                 "timestamp": ts.isoformat() if ts else now_naive.isoformat(),
                 "link": f"/u/{user_data['username']}",
+            })
+
+    # 6. Pending (unreviewed) reports — admin only
+    if current.role == "admin":
+        pending_reports = (
+            db.query(Report)
+            .filter(Report.reviewed == False)  # noqa: E712
+            .order_by(Report.created_at.desc())
+            .all()
+        )
+        for rep in pending_reports:
+            ts = rep.created_at
+            notifications.append({
+                "type": "report",
+                "id": f"rep_{rep.id}",
+                "report_id": rep.id,
+                "reporter_username": rep.reporter.username if rep.reporter else "?",
+                "target_type": rep.target_type,
+                "target_id": rep.target_id,
+                "target_name": rep.target_name,
+                "reason": rep.reason,
+                "timestamp": ts.isoformat() if ts else now_naive.isoformat(),
+                "link": (
+                    f"/mealplans?open={rep.target_id}"
+                    if rep.target_type == "meal"
+                    else f"/workouts?open={rep.target_id}"
+                ),
             })
 
     notifications.sort(key=lambda x: x.get("timestamp", ""), reverse=True)

@@ -52,7 +52,7 @@ function NewMealCard({ item, t, lang, navigate }) {
   const imgSrc = resolveAssetUrl(meal.image_url)
   return (
     <FeedCard icon="🥗" label={t.feed_new_meal} timestamp={timeAgo(item.timestamp, t)} accent="var(--green)">
-      <button className="feed-media-btn" onClick={() => navigate('/mealplans')}>
+      <button className="feed-media-btn" onClick={() => navigate(`/mealplans?open=${meal.id}`)}>
         <div className="feed-square-img-wrap">
           {imgSrc
             ? <img src={imgSrc} alt={name} className="feed-square-img" />
@@ -84,7 +84,7 @@ function NewWorkoutCard({ item, t, lang, navigate }) {
   const imgSrc = resolveAssetUrl(plan.image_url)
   return (
     <FeedCard icon="🏋️" label={t.feed_new_workout} timestamp={timeAgo(item.timestamp, t)} accent="var(--accent)">
-      <button className="feed-media-btn" onClick={() => navigate('/workouts')}>
+      <button className="feed-media-btn" onClick={() => navigate(`/workouts?open=${plan.id}`)}>
         <div className="feed-square-img-wrap">
           {imgSrc
             ? <img src={imgSrc} alt={name} className="feed-square-img" />
@@ -328,7 +328,7 @@ function TrendingCard({ type, item, t, lang, navigate }) {
   const obj = isWorkout ? item.workout : item.meal
   const name = (lang === 'ka' && obj.name_ka) ? obj.name_ka : obj.name
   const imgUrl = resolveAssetUrl(obj.image_url)
-  const dest = isWorkout ? '/workouts' : '/mealplans'
+  const dest = isWorkout ? `/workouts?open=${obj.id}` : `/mealplans?open=${obj.id}`
 
   return (
     <button className="trending-card" onClick={() => navigate(dest)}>
@@ -419,9 +419,6 @@ export default function Home() {
   const [feed, setFeed] = useState(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
-  const [adminUsers, setAdminUsers] = useState([])
-  const [showAdmin, setShowAdmin] = useState(false)
-  const [adminLoading, setAdminLoading] = useState(false)
 
   const fetchFeed = useCallback(async (silent = false) => {
     if (silent) setRefreshing(true)
@@ -438,19 +435,6 @@ export default function Home() {
   }, [])
 
   useEffect(() => { fetchFeed() }, [fetchFeed])
-
-  async function fetchAdminUsers() {
-    setAdminLoading(true)
-    try {
-      const { data } = await api.get('/admin/users')
-      setAdminUsers(data)
-      setShowAdmin(true)
-    } catch {
-      alert('Failed to fetch admin data.')
-    } finally {
-      setAdminLoading(false)
-    }
-  }
 
   const hasTrending = feed && (feed.trending_meals.length > 0 || feed.trending_workouts.length > 0)
   const hasItems = feed && feed.items.length > 0
@@ -474,57 +458,6 @@ export default function Home() {
           {refreshing ? '⟳' : '↻'} {t.feed_refresh}
         </button>
       </div>
-
-      {/* ── Admin panel ──────────────────────────────────────────── */}
-      {user.role === 'admin' && (
-        <div className="feed-admin-wrap">
-          <button
-            className="btn btn-secondary"
-            onClick={showAdmin ? () => setShowAdmin(false) : fetchAdminUsers}
-            disabled={adminLoading}
-            style={{ width: 'auto', padding: '10px 18px', fontSize: 13 }}
-          >
-            {adminLoading ? t.admin_loading : showAdmin ? t.admin_hide : t.admin_open}
-          </button>
-          {showAdmin && (
-            <div className="admin-panel" style={{ marginTop: 14 }}>
-              <div className="admin-panel-header">
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)' }}>
-                  ⚡ {t.admin_title} ({adminUsers.length})
-                </span>
-                <span className="testing-tag">{t.admin_testing}</span>
-              </div>
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    {[t.col_id, t.col_username, t.col_name, t.col_email, t.col_role, t.col_goal, t.col_wh, t.col_hash].map(
-                      (h) => <th key={h}>{h}</th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {adminUsers.map((u) => (
-                    <tr key={u.id}>
-                      <td>{u.id}</td>
-                      <td>@{u.username}</td>
-                      <td>{u.firstname} {u.lastname}</td>
-                      <td>{u.email}</td>
-                      <td>
-                        <span className={`badge ${u.role === 'admin' ? 'badge-admin' : 'badge-user'}`} style={{ fontSize: 10 }}>
-                          {u.role}
-                        </span>
-                      </td>
-                      <td>{u.goal ? (t.goals[u.goal] || u.goal) : '—'}</td>
-                      <td style={{ whiteSpace: 'nowrap' }}>{u.weight ? `${u.weight}kg` : '—'} / {u.height ? `${u.height}cm` : '—'}</td>
-                      <td className="hash-cell">{u.password_hash}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* ── Two-column layout: feed + sidebar ────────────────────── */}
       <div className="feed-layout">

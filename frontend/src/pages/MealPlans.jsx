@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useApp } from '../contexts/AppContext'
 import api from '../api/client'
 import MealCard from '../components/meals/MealCard'
@@ -23,6 +24,7 @@ const PAGE_SIZE = 6
 export default function MealPlans() {
   const { t, lang } = useApp()
   const user = JSON.parse(localStorage.getItem('user') || 'null')
+  const [searchParams] = useSearchParams()
   const [meals, setMeals] = useState([])
   const [loading, setLoading] = useState(true)
   const [goalFilter, setGoalFilter] = useState('all')
@@ -51,6 +53,15 @@ export default function MealPlans() {
 
   // Always fetch ALL meals (no server-side sort/filter for sections to work)
   useEffect(() => { loadMeals() }, [loadMeals])
+
+  // Auto-open a meal when ?open=<id> is in the URL
+  useEffect(() => {
+    const openId = searchParams.get('open')
+    if (!openId || meals.length === 0) return
+    const target = meals.find((m) => m.id === parseInt(openId, 10))
+    if (target) handleView(target)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [meals, searchParams])
 
   // Whether we're on the default "recommended" view with no goal filter
   const isDefaultView = sort === 'recommended' && goalFilter === 'all'
@@ -285,6 +296,8 @@ export default function MealPlans() {
           onClose={() => setSelectedMeal(null)}
           onRate={handleRate}
           appLang={lang}
+          currentUser={user}
+          onDeleted={(id) => setMeals((prev) => prev.filter((m) => m.id !== id))}
         />
       )}
 

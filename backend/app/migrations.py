@@ -221,6 +221,34 @@ def ensure_muscle_achievements_table() -> None:
         )
 
 
+def ensure_age_column() -> None:
+    """Adds the age column to the users table if it doesn't exist."""
+    with engine.begin() as conn:
+        rows = conn.execute(text("PRAGMA table_info(users)")).fetchall()
+        existing = {r[1] for r in rows}
+        if "age" not in existing:
+            conn.execute(text("ALTER TABLE users ADD COLUMN age INTEGER"))
+
+
+def ensure_reports_table() -> None:
+    """Creates the reports table if it doesn't exist."""
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "CREATE TABLE IF NOT EXISTS reports ("
+                "id INTEGER PRIMARY KEY, "
+                "reporter_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, "
+                "target_type VARCHAR NOT NULL, "
+                "target_id INTEGER NOT NULL, "
+                "target_name VARCHAR, "
+                "reason VARCHAR NOT NULL, "
+                "notes TEXT, "
+                "reviewed BOOLEAN NOT NULL DEFAULT 0, "
+                "created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
+            )
+        )
+
+
 def ensure_challenges_columns() -> None:
     """Adds missing columns to the challenges table for forward-migration."""
     expected: dict[str, str] = {

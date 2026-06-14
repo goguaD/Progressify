@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import StarRating from './StarRating'
 import { resolveAssetUrl } from '../../api/client'
+import ReportModal from '../ReportModal'
+import api from '../../api/client'
 
 const GOAL_LABELS = {
   cut: { en: '🔥 Fat Loss / Cut', ka: '🔥 წონის კლება' },
@@ -10,8 +12,24 @@ const GOAL_LABELS = {
   cheat: { en: '🍫 Healthy Cheat', ka: '🍫 ჯანსაღი ჩითი' },
 }
 
-export default function MealDetail({ meal, t, onClose, onRate, appLang }) {
+export default function MealDetail({ meal, t, onClose, onRate, appLang, currentUser, onDeleted }) {
   const [lang, setLang] = useState(appLang || 'en')
+  const [showReport, setShowReport] = useState(false)
+
+  const canDelete = currentUser && (
+    currentUser.role === 'admin' || meal.added_by === currentUser.id
+  )
+
+  async function handleDelete() {
+    if (!window.confirm(t.admin_delete_confirm || 'Delete this meal?')) return
+    try {
+      await api.delete(`/meals/${meal.id}`)
+      onDeleted?.(meal.id)
+      onClose()
+    } catch (err) {
+      alert(err?.response?.data?.detail || 'Failed to delete.')
+    }
+  }
 
   const name = lang === 'ka' && meal.name_ka ? meal.name_ka : meal.name
   const description = lang === 'ka' && meal.description_ka ? meal.description_ka : meal.description
@@ -134,8 +152,31 @@ export default function MealDetail({ meal, t, onClose, onRate, appLang }) {
               {t.meals_added_by || 'Added by'} <strong>@{meal.added_by_username}</strong>
             </p>
           )}
+
+          <div className="meal-detail-action-row">
+            {canDelete && (
+              <button className="btn-danger-sm" onClick={handleDelete}>
+                🗑️ {t.admin_delete || 'Delete'}
+              </button>
+            )}
+            {currentUser && (
+              <button className="btn-report-sm" onClick={() => setShowReport(true)}>
+                🚩 {t.report_btn || 'Report'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
+
+      {showReport && (
+        <ReportModal
+          targetType="meal"
+          targetId={meal.id}
+          targetName={meal.name}
+          t={t}
+          onClose={() => setShowReport(false)}
+        />
+      )}
     </div>
   )
 }

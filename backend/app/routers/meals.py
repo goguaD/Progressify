@@ -1,4 +1,5 @@
 import uuid
+from pydantic import BaseModel
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
@@ -6,10 +7,15 @@ from sqlalchemy.orm import Session
 from app.config import ALLOWED_AVATAR_TYPES, MAX_AVATAR_BYTES, MEAL_IMG_DIR
 from app.database import get_db
 from app.deps import get_current_user
-from app.models import Meal, MealRating, User
+from app.models import Meal, MealRating, Report, User
 from app.repositories.meal_repo import MealRepository
 from app.schemas import MEAL_GOALS, MealOut, MealRateRequest
 from app.services.meal_service import meal_out_dict
+
+
+class ReportRequest(BaseModel):
+    reason: str
+    notes: str | None = None
 
 router = APIRouter(prefix="/meals", tags=["meals"])
 
@@ -121,6 +127,47 @@ def record_view(
 
     my = repo.get_user_rating(meal.id, current.id)
     return meal_out_dict(meal, my.score if my else None)
+
+
+@router.delete("/{meal_id}")
+def delete_meal(
+    meal_id: int,
+    db: Session = Depends(get_db),
+    current: User = Depends(get_current_user),
+) -> dict:
+    repo = MealRepository(db)
+    meal = repo.get_by_id(meal_id)
+    if not meal:
+        raise HTTPException(status_code=404, detail="Meal not found")
+    if current.role != "admin" and meal.added_by != current.id:
+        raise HTTPException(status_code=403, detail="You can only delete your own meals")
+    db.delete(meal)
+    db.commit()
+    return {"ok": True}
+
+
+@router.post("/{meal_id}/report")
+def report_meal(
+    meal_id: int,
+    body: ReportRequest,
+    db: Session = Depends(get_db),
+    current: User = Depends(get_current_user),
+) -> dict:
+    repo = MealRepository(db)
+    meal = repo.get_by_id(meal_id)
+    if not meal:
+        raise HTTPException(status_code=404, detail="Meal not found")
+    report = Report(
+        reporter_id=current.id,
+        target_type="meal",
+        target_id=meal_id,
+        target_name=meal.name,
+        reason=body.reason,
+        notes=body.notes,
+    )
+    db.add(report)
+    db.commit()
+    return {"ok": True}
 
 
 @router.post("/{meal_id}/rate", response_model=MealOut)

@@ -32,6 +32,7 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)) -> dict:
         password_hash=auth_service.hash_password(user_data.password),
         weight=user_data.weight,
         height=user_data.height,
+        age=user_data.age,
         goal=user_data.goal,
         gender=user_data.gender,
         role="user",

@@ -33,6 +33,7 @@ class User(Base):
     gender = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    age = Column(Integer, nullable=True)
     last_seen = Column(DateTime(timezone=True), nullable=True)
     is_online = Column(Boolean, nullable=False, default=False)
 
@@ -407,3 +408,26 @@ class MuscleAchievement(Base):
     achieved_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", foreign_keys=[user_id])
+
+
+class Report(Base):
+    """A user report on a meal or workout plan."""
+
+    __tablename__ = "reports"
+
+    id = Column(Integer, primary_key=True, index=True)
+    reporter_id = Column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    target_type = Column(String, nullable=False)   # "meal" | "workout"
+    target_id = Column(Integer, nullable=False, index=True)
+    target_name = Column(String, nullable=True)
+    reason = Column(String, nullable=False)
+    notes = Column(Text, nullable=True)
+    reviewed = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    reporter = relationship("User", foreign_keys=[reporter_id])

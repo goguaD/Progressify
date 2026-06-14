@@ -4,6 +4,8 @@ import ExerciseMuscleMap from './ExerciseMuscleMap'
 import { musclesForExercise } from './exerciseMuscles'
 import { resolveAssetUrl } from '../../api/client'
 import { translations } from '../../i18n'
+import ReportModal from '../ReportModal'
+import api from '../../api/client'
 
 const PURPOSE_META = {
   strength: { en: 'Strength', ka: 'ძალა', cls: 'strength', emoji: '🏋️' },
@@ -22,9 +24,12 @@ export default function WorkoutDetail({
   plan, t, onClose, onRate, onAddToProfile,
   isActive = false,
   appLang: appLangProp,
+  currentUser,
+  onDeleted,
 }) {
   const [appLang, setAppLang] = useState(appLangProp || 'en')
   const [activeDay, setActiveDay] = useState(0)
+  const [showReport, setShowReport] = useState(false)
   const gender = readUserGender()
 
   // Keep content language in sync when the app-level language changes
@@ -34,6 +39,21 @@ export default function WorkoutDetail({
 
   // Use translations that match the modal's own language toggle
   const localT = translations[appLang] || t
+
+  const canDelete = currentUser && (
+    currentUser.role === 'admin' || plan.added_by === currentUser.id
+  )
+
+  async function handleDelete() {
+    if (!window.confirm(localT.admin_delete_confirm || 'Delete this workout plan?')) return
+    try {
+      await api.delete(`/workouts/${plan.id}`)
+      onDeleted?.(plan.id)
+      onClose()
+    } catch (err) {
+      alert(err?.response?.data?.detail || 'Failed to delete.')
+    }
+  }
 
   if (!plan) return null
 
@@ -154,8 +174,31 @@ export default function WorkoutDetail({
               </div>
             </div>
           )}
+
+          {currentUser && (
+            <div className="workout-detail-danger-row">
+              {canDelete && (
+                <button className="btn-danger-sm" onClick={handleDelete}>
+                  🗑️ {localT.admin_delete || 'Delete'}
+                </button>
+              )}
+              <button className="btn-report-sm" onClick={() => setShowReport(true)}>
+                🚩 {localT.report_btn || 'Report'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
+
+      {showReport && (
+        <ReportModal
+          targetType="workout"
+          targetId={plan.id}
+          targetName={plan.name}
+          t={localT}
+          onClose={() => setShowReport(false)}
+        />
+      )}
     </div>
   )
 }

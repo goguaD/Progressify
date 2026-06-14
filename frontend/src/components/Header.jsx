@@ -78,6 +78,15 @@ function NotifItem({ notif, t, onNavigate }) {
           </span>
         )
       }
+      case 'report':
+        return (
+          <span>
+            <strong>@{notif.reporter_username}</strong>{' '}
+            {t.notif_report}{' '}
+            <em>{notif.target_type}: {notif.target_name}</em>
+            {' — '}<em>{notif.reason}</em>
+          </span>
+        )
       default:
         return <span>{notif.type}</span>
     }
@@ -94,6 +103,7 @@ function NotifItem({ notif, t, onNavigate }) {
         {notif.type === 'challenge_completed' && '🏆'}
         {notif.type === 'friend_pr' && '💪'}
         {notif.type === 'muscle_achievement' && '🧬'}
+        {notif.type === 'report' && '🚨'}
       </span>
       <span className="notif-item-body">{label()}</span>
       <span className="notif-item-time">{timeAgoShort(notif.timestamp)}</span>
@@ -167,6 +177,7 @@ export default function Header({ user, onLogout }) {
     { to: '/workouts',    label: t.nav_workouts },
     { to: '/friends',     label: t.nav_friends },
     { to: '/challenges',  label: t.nav_challenges },
+    ...(user?.role === 'admin' ? [{ to: '/admin', label: t.admin_nav || '⚡ Admin' }] : []),
   ]
 
   const initials = ((user?.firstname?.[0] || '') + (user?.lastname?.[0] || '')).toUpperCase() || '?'

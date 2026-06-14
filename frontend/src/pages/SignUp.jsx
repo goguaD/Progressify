@@ -22,6 +22,7 @@ export default function SignUp() {
     confirmPassword: '',
     weight: '',
     height: '',
+    age: '',
     goal: '',
     gender: '',
   })
@@ -33,7 +34,6 @@ export default function SignUp() {
     { value: 'weight_loss',  label: t.goals.weight_loss },
     { value: 'maintain',     label: t.goals.maintain },
     { value: 'endurance',    label: t.goals.endurance },
-    { value: 'flexibility',  label: t.goals.flexibility },
   ]
 
   function handleChange(e) {
@@ -58,6 +58,8 @@ export default function SignUp() {
   function validateStep2() {
     if (!form.weight || isNaN(form.weight) || Number(form.weight) <= 0) return t.err_weight
     if (!form.height || isNaN(form.height) || Number(form.height) <= 0) return t.err_height
+    const age = Number(form.age)
+    if (!form.age || isNaN(age) || age < 13 || age > 100) return t.err_age
     if (!form.gender) return t.err_gender
     if (!form.goal) return t.err_goal
     return null
@@ -87,6 +89,7 @@ export default function SignUp() {
         password: form.password,
         weight: Number(form.weight),
         height: Number(form.height),
+        age: Number(form.age),
         goal: form.goal,
         gender: form.gender,
       })
@@ -294,6 +297,24 @@ export default function SignUp() {
                     />
                     <span className="input-unit">cm</span>
                   </div>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="age">{t.bmi_age || 'Age'}</label>
+                <div className="input-with-unit">
+                  <input
+                    id="age"
+                    name="age"
+                    type="number"
+                    placeholder="25"
+                    min="13"
+                    max="100"
+                    step="1"
+                    value={form.age}
+                    onChange={handleChange}
+                  />
+                  <span className="input-unit">{t.age_unit || 'yrs'}</span>
                 </div>
               </div>
 
